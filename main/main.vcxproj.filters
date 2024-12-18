@@ -15,33 +15,33 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Global.cpp">
+    <ClCompile Include="source\CoefficientsSixDoF_FandM.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="source\Controller_State.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Vehicle_State.cpp">
+    <ClCompile Include="source\Global.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CoefficientsSixDoF_FandM.cpp">
+    <ClCompile Include="source\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Controller_State.cpp">
+    <ClCompile Include="source\Vehicle_State.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Global.h">
+    <ClInclude Include="include\Vehicle_State.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CoefficientsSixDoF_FandM.h">
+    <ClInclude Include="include\Global.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Vehicle_State.h">
+    <ClInclude Include="include\Controller_State.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Controller_State.h">
+    <ClInclude Include="include\CoefficientsSixDoF_FandM.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

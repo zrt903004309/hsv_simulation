@@ -25,8 +25,8 @@ void main()
 	File_Vehicle = fopen(mconfig.vehicle_filename, "w");
     File_Control = fopen(mconfig.control_filename, "w");
 	
-	printf(controlMode);
-	printf(situation);
+	//printf(controlMode);
+	//printf(situation);
 
 	start = clock();  //开始计时
 	for(unsigned int i = 1; i <= mconfig.iters; i++)
@@ -43,6 +43,6 @@ void main()
 	stop = clock();  // 结束计时
 	duration = (double)(stop - start) / CLK_TCK;  // 因为计时是以毫秒为单位的，除以CLK_TCK可以换算成秒，输出为迭代循环所需的时间/s
 	cout << duration << endl;
-	printf("%f\n",duration);  // 输出迭代循环所需的时间
+	printf("%f 秒\n",duration);  // 输出迭代循环所需的时间
 
 }

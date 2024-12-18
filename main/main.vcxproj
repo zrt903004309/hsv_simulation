@@ -14,6 +14,7 @@
     <ProjectGuid>{D329E09C-96DE-48A6-8A84-064EFD8437ED}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>main</RootNamespace>
+    <ProjectName>runtime</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,6 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -52,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
@@ -79,17 +81,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Global.cpp" />
-    <ClCompile Include="CoefficientsSixDoF_FandM.cpp" />
-    <ClCompile Include="Controller_State.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Vehicle_State.cpp" />
+    <ClCompile Include="source\CoefficientsSixDoF_FandM.cpp" />
+    <ClCompile Include="source\Controller_State.cpp" />
+    <ClCompile Include="source\Global.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Vehicle_State.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CoefficientsSixDoF_FandM.h" />
-    <ClInclude Include="Controller_State.h" />
-    <ClInclude Include="Global.h" />
-    <ClInclude Include="Vehicle_State.h" />
+    <ClInclude Include="include\CoefficientsSixDoF_FandM.h" />
+    <ClInclude Include="include\Controller_State.h" />
+    <ClInclude Include="include\Global.h" />
+    <ClInclude Include="include\Vehicle_State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
