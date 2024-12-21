@@ -1,4 +1,5 @@
 #include<Global.h>
+#include<Record.h>
 #include "Controller_State.h"
 #include "Vehicle_State.h"
 
@@ -34,7 +35,7 @@ void main()
 		if(i % mconfig.tctrl == 1)
 		{  // 控制器更新。输入为飞行器状态、控制器状态、飞行器参数。输出为控制器状态
 			Controller_State.Controller_State_Update(Vehicle_State, Vehicle_Para, mconfig);  
-	//		Record(Vehicle_State, Controller_State, File_Vehicle, File_Control);  // 记录所得数据，输出txt
+			Record(Vehicle_State, Controller_State, File_Vehicle, File_Control);  // 记录所得数据，输出txt
 		}
 	//	// 飞行器状态更新。输入为飞行器状态、控制器状态、飞行器参数、仿真步长。输出为飞行器状态
 		Vehicle_State.Vehicle_State_Update(Controller_State, Vehicle_Para, mconfig.step);

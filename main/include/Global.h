@@ -46,8 +46,8 @@ struct ModelConfig
 	const double delta_e_limit = 30.0 / rad;			// ¶æÃæ½ÇÏÞ·ù
 
 
-	const char* vehicle_filename = "result_vehicle.txt";
-	const char* control_filename = "result_control.txt";
+	const char* vehicle_filename = "../data/result_vehicle.txt";
+	const char* control_filename = "../data/result_control.txt";
 };
 
 

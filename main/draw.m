@@ -1,7 +1,7 @@
 clear all;
 close all;
-data1=load('result_control.txt');
-data2=load('result_vehicle.txt'); 
+data1=load('./data/result_control.txt');
+data2=load('./data/result_vehicle.txt'); 
 
 num = 2;
 

@@ -30,6 +30,9 @@
     <ClCompile Include="source\Vehicle_State.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Record.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Vehicle_State.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\CoefficientsSixDoF_FandM.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Record.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

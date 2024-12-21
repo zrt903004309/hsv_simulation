@@ -85,12 +85,14 @@
     <ClCompile Include="source\Controller_State.cpp" />
     <ClCompile Include="source\Global.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Record.cpp" />
     <ClCompile Include="source\Vehicle_State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CoefficientsSixDoF_FandM.h" />
     <ClInclude Include="include\Controller_State.h" />
     <ClInclude Include="include\Global.h" />
+    <ClInclude Include="include\Record.h" />
     <ClInclude Include="include\Vehicle_State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
