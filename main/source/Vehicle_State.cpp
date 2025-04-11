@@ -1,11 +1,10 @@
-#include "Vehicle_State.h"
-#include <Controller_State.h>
+#include <Vehicle_State.h>
 
 void VehicleState::Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step)
 {
 	double F_D, F_Y, F_L;	// 阻力D，侧力Y，升力L
 	double M_X, M_Y, M_Z;
-	double d_X,d_Y,d_Z,d_V,d_Gamma,d_Chi,d_Alpha,d_Beta,d_Mu,d_p,d_q,d_r,d_Var_theta,d_Psi,d_Phi_b;
+	double d_X, d_Y, d_Z, d_V, d_Gamma, d_Chi, d_Alpha,d_Beta, d_Mu, d_p, d_q, d_r, d_Var_theta, d_Psi, d_Phi_b;
 	vector<double> Delta(3, 0.0), M_c(3, 0.0);
 	double Mass, Jx, Jy, Jz, C, B, S;
 	
@@ -28,25 +27,22 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	M_c[1] = Controller_State.M_c[1];
 	M_c[2] = Controller_State.M_c[2];
 
+	// 所有单位原始情况都是弧度制，公式中需要的是角度制
 	vector<double> C_FM(6);
-	CoefficientsSixDoF_FandM(Ma, Alpha*rad, Beta*rad, Delta[0]*rad, Delta[1]*rad, Delta[2]*rad, C, B, V, p*rad, q*rad, r*rad, C_FM);
+	getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
 	F_D = C_FM[0] * 0.5 * rho * V * V * S;
 	F_L = C_FM[1] * 0.5 * rho * V * V * S;
 	F_Y = C_FM[2] * 0.5 * rho * V * V * S;
+	// 计算力矩
+	M_X = C_FM[3] * 0.5 * rho * V * V * S * B;
+	M_Y = C_FM[4] * 0.5 * rho * V * V * S * C;
+	M_Z = C_FM[5] * 0.5 * rho * V * V * S * B;
 
-	//printf("%f %f %f %f %f %f %f %f %f %f \n", Ma, Alpha, Beta, Mu, X, Y, Z, p, q, r);
-	//printf("%f %f %f \n", Delta[0], Delta[1], Delta[2]);
+	printf("马赫:%f 攻角:%f 侧滑角:%f 倾侧角:%f\n", Ma, Alpha*rad, Beta*rad, Mu*rad);
+	//printf("X:%f Y:%f H:%f\n",X, Y, -Z);
+	//printf("p:%f q:%f r:%f \n", p, q, r);
+	//printf("左升降副翼:%f 右升降副翼:%f 方向舵:%f \n", Delta[0]*rad, Delta[1]*rad, Delta[2]*rad);
 	
-	//力矩
-	M_X = M_c[0];
-	M_Y = M_c[1];
-	M_Z = M_c[2]; 
-
-	if (situation == " ") {
-		M_X = 0;
-		M_Y = 0;
-		M_Z = 0;
-	}
 	
 	// 飞行器运动非线性方程组
 	d_X     = V * cos(Chi) * cos(Gamma);
@@ -57,7 +53,7 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	d_Chi   = (F_L * sin(Mu) + F_Y * cos(Mu)) / (Mass * V * cos(Gamma));
 	d_Alpha = q - tan(Beta) * (p * cos(Alpha) + r * sin(Alpha)) + (-F_L  + Mass * g * cos(Gamma) * cos(Mu)) / (Mass * V * cos(Beta));
 	d_Beta  = p * sin(Alpha) - r * cos(Alpha) + (F_Y + Mass * g * cos(Gamma) * sin(Mu)) / (Mass * V);
-	d_Mu    = (p * cos(Alpha) + r * sin(Alpha)) / (cos(Beta)) + (F_L * tan(Beta) + F_L * tan(Gamma) * sin(Mu) + F_Y * tan(Gamma) * cos(Mu) - Mass * g * cos(Gamma) * cos(Mu) * tan(Beta)) / (Mass * V);
+	d_Mu    = (p * cos(Alpha) + r * sin(Alpha)) / cos(Beta) + (F_L * tan(Beta) + F_L * tan(Gamma) * sin(Mu) + F_Y * tan(Gamma) * cos(Mu) - Mass * g * cos(Gamma) * cos(Mu) * tan(Beta)) / (Mass * V);
 	d_p     = M_X / Jx + q * r * (Jy - Jz) / Jx;
 	d_q     = M_Y / Jy + p * r * (Jz - Jx) / Jy;
 	d_r     = M_Z / Jz + p * q * (Jx - Jy) / Jz;
@@ -89,12 +85,11 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 
 	// 输入高度，利用新高度输出声速a，马赫数Ma，重力加速度g和大气密度rho
 	AtmoPara atmo;
-	atmo.GetAtmoPara(Z);
+	atmo.GetAtmoPara(-Z);
 
 	Ma = V / atmo.a;
 	rho = atmo.rho;
 	g = atmo.g;
-	//printf("%f %f %f %f %f %f %f %f %f %f \n", Ma, Alpha, Beta, Mu, X, Y, Z, p, q, r);
 
 }
 

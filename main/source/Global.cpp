@@ -1,4 +1,4 @@
-#include "Global.h"
+#include <Global.h>
 
 void AtmoPara::GetAtmoPara(double h) //获取大气参数，输入为高度，输出为声速a，重力加速度g和大气密度rho
 {

@@ -3,8 +3,11 @@
 #define _CONTROLLER_STATE_H
 
 #include <Global.h>
+#include <Vehicle_State.h>
+#include <Guidance_State.h>
 
 class VehicleState;
+class GuidanceState;
 struct VehiclePara;
 struct ModelConfig;
 
@@ -13,7 +16,7 @@ public:
 
 	ControllerState();
 
-	void Controller_State_Update(const VehicleState& Vehicle_State, const VehiclePara& Vehicle_Para, const ModelConfig& Model_Config);
+	void Controller_State_Update(const VehicleState& Vehicle_State, const GuidanceState Guidance_State, const VehiclePara& Vehicle_Para, const ModelConfig& Model_Config);
 
 	// Pre表示上一时刻 
 	double e_Alpha_Pre;					// 攻角的偏差（参考值-实际值）

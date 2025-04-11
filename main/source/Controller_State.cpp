@@ -1,31 +1,25 @@
-#include "Controller_State.h"
-#include <Vehicle_State.h>
+#include <Controller_State.h>
 
 int sgn_s(double s);
 double sat_s(double s, double k_sat);
-double limit(double x, double Min, double Max);
+double limit(const double& x, const double& x_pre, const double& amplitude_limit, const double& velocity_limit);
 
-void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State, const VehiclePara& Vehicle_Para, const ModelConfig& Model_Config)
+void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State, const GuidanceState Guidance_State, const VehiclePara& Vehicle_Para, const ModelConfig& Model_Config)
 {
 	
-	double sat_limit_a = 0.01,sat_limit_b = 0.01,sat_limit_m = 0.01;
-	double X,Y,Z,V,Gamma,Chi,Alpha,Beta,Mu,p,q,r,Time;
-
-	double Mass, Jx, Jy, Jz, B, C, S;
-	
-	double Alpha_Ref;
-	double Beta_Ref;
-	double Mu_Ref;
-	double dd_Alpha_Ref;
-	double dd_Beta_Ref;
-	double dd_Mu_Ref;
-	
-	double e_Alpha,de_Alpha;
-	double e_Beta,de_Beta;
-	double e_Mu,de_Mu;
-
-	double f1,f2,f3,f4,f5,f6;
+	double sat_limit_a = 0.02,sat_limit_b = 0.02,sat_limit_m = 0.02;
+	// 飞行器状态(直接读取)
+	double X, Y, Z, V, Gamma, Chi, Alpha, Beta, Mu, p, q, r, Time;
+	// 飞行器参数(直接读取)
+	double Mass, Jx, Jy, Jz, B, C, S, Xcg;
+	// 跟踪姿态(直接读取)
+	double Alpha_Ref, Beta_Ref, Mu_Ref, dd_Alpha_Ref, dd_Beta_Ref, dd_Mu_Ref;
+	// 常量获取	
 	double rho, g, Ma;
+	
+	// 控制器参数，需要计算
+	double e_Alpha, de_Alpha, e_Beta, de_Beta, e_Mu, de_Mu;
+	double f1, f2, f3, f4, f5, f6;
 
 	Eigen::Vector3d F_Back = Eigen::Vector3d::Zero();
 	Eigen::Vector3d v_c = Eigen::Vector3d::Zero();
@@ -56,31 +50,42 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	B = Vehicle_Para.B;
 	C = Vehicle_Para.C;
 	S = Vehicle_Para.S;
+	Xcg = Vehicle_Para.Xcg;
 
-	// 期望的姿态角以及他们的二阶导参考值
-	Alpha_Ref = Model_Config.alpha_ref;
-	Beta_Ref = Model_Config.beta_ref;
-	Mu_Ref = Model_Config.mu_ref;
-	dd_Alpha_Ref = Model_Config.dd_alpha_ref;
-	dd_Beta_Ref = Model_Config.dd_beta_ref;
-	dd_Mu_Ref = Model_Config.dd_mu_ref;
-
-	// 当前的姿态角的偏差（姿态角的*参考值* - 姿态角的*当前值*）
-	e_Alpha = Alpha_Ref-Alpha;
-	e_Beta = Beta_Ref-Beta;
-	e_Mu = Mu_Ref-Mu;
-
-	// 输出姿态角误差的一阶导（一阶微分迭代公式） 增加了一个 大的一阶滤波
-	de_Alpha = (e_Alpha - e_Alpha_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Alpha_Pre * 0.9851;
-	de_Beta = (e_Beta - e_Beta_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Beta_Pre * 0.9851;
-	de_Mu = (e_Mu - e_Mu_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Mu_Pre * 0.9851;
-	
 	// 输入高度，输出声速a，马赫数Ma，重力加速度g和大气密度rho
 	AtmoPara atmo;
-	atmo.GetAtmoPara(Z);
+	atmo.GetAtmoPara(-Z);
 	rho = atmo.rho;
 	g = atmo.g;
 	Ma = V / atmo.a;
+
+	// 期望的姿态角以及他们的二阶导参考值
+	Alpha_Ref = Guidance_State.alpha_ref;
+	Beta_Ref = Guidance_State.beta_ref;
+	Mu_Ref = Guidance_State.mu_ref;
+	dd_Alpha_Ref = Guidance_State.dd_alpha_ref;
+	dd_Beta_Ref = Guidance_State.dd_beta_ref;
+	dd_Mu_Ref = Guidance_State.dd_mu_ref;
+
+	// 当前的姿态角的偏差（姿态角的*参考值* - 姿态角的*当前值*）
+	e_Alpha = Alpha_Ref - Alpha;
+	e_Beta = Beta_Ref - Beta;
+	e_Mu = Mu_Ref - Mu;
+
+	// 输出姿态角误差的一阶导（一阶微分迭代公式） 增加了一个 大的一阶滤波
+	/*de_Alpha = (e_Alpha - e_Alpha_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Alpha_Pre * 0.9851;
+	de_Beta = (e_Beta - e_Beta_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Beta_Pre * 0.9851;
+	de_Mu = (e_Mu - e_Mu_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Mu_Pre * 0.9851;*/
+	de_Alpha = (e_Alpha - e_Alpha_Pre) / (Model_Config.step * Model_Config.tctrl);
+	de_Beta = (e_Beta - e_Beta_Pre) / (Model_Config.step * Model_Config.tctrl);
+	de_Mu = (e_Mu - e_Mu_Pre) / (Model_Config.step * Model_Config.tctrl);
+
+	// 输出姿态角误差的一阶导（一阶微分迭代公式） 增加了一个 大的一阶滤波
+	i_e_Alpha += e_Alpha * (Model_Config.step * Model_Config.tctrl);
+	i_e_Beta += e_Beta * (Model_Config.step * Model_Config.tctrl);
+	i_e_Mu += e_Mu * (Model_Config.step * Model_Config.tctrl);
+	
+	//printf("三轴误差:%f %f %f 三轴误差的微分:%f %f %f 三轴误差的积分:%f %f %f\n", e_Alpha, e_Beta, e_Mu, de_Alpha, de_Beta, de_Mu, i_e_Alpha, i_e_Beta, i_e_Mu);
 
 	// 计算状态空间方程中的f(x)
 	f1 = (Jy - Jz) * q * r / Jx;
@@ -97,37 +102,15 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 
 	// 对应二阶导数中的E
 	E_Back(0, 0) = -cos(Alpha) * tan(Beta) / Jx;
-	E_Back(0, 1) = 1 / Jy;
-	E_Back(0, 2) = -sin(Alpha) * tan(Beta) / Jz;
-	E_Back(1, 0) = sin(Alpha) / Jx;
+	E_Back(0, 1) = sin(Alpha) / Jx;
+	E_Back(0, 2) = (cos(Alpha) / cos(Beta)) / Jx;
+	E_Back(1, 0) = 1 / Jy;
 	E_Back(1, 1) = 0;
-	E_Back(1, 2) = -cos(Alpha) / Jz;
-	E_Back(2, 0) = (cos(Alpha) / cos(Beta)) / Jx;
-	E_Back(2, 1) = 0;
+	E_Back(1, 2) = 0;
+	E_Back(2, 0) = -sin(Alpha) * tan(Beta) / Jz;
+	E_Back(2, 1) = -cos(Alpha) / Jz;
 	E_Back(2, 2) = (sin(Alpha) / cos(Beta)) / Jz;
 
-	/*
-	s_Alpha_0 = Controller_State.s_Alpha_0;
-	s_Beta_0 = Controller_State.s_Beta_0;
-	s_Mu_0 = Controller_State.s_Mu_0;
-	if(Time <= 0.001)
-    {  //定义s0=0
-	   s_Alpha_0 = -(de_Alpha+A_k*e_Alpha);
-	   s_Beta_0 = -(de_Beta+A_k*e_Beta);
-	   s_Mu_0 = -(de_Mu+A_k*e_Mu);
-	}
-
-	//构造时变滑模函数
-	s_Alpha = A_k*e_Alpha + de_Alpha + s_Alpha_0*exp(-A_lambda*Time);
-	s_Beta = B_k*e_Beta + de_Beta + s_Beta_0*exp(-B_lambda*Time);
-	s_Mu = M_k*e_Mu + de_Mu + s_Mu_0*exp(-M_lambda*Time);
-
-	//计算辅助控制率
-	v_c[0] = A_k*de_Alpha + A_eta*sat_s(s_Alpha,sat_limit_a) + dd_Alpha_Ref - s_Alpha_0*A_lambda*exp(-A_lambda*Time);
-	v_c[1] = B_k*de_Beta + B_eta*sat_s(s_Beta,sat_limit_b) + dd_Beta_Ref - s_Beta_0*B_lambda*exp(-B_lambda*Time);
-	v_c[2] = M_k*de_Mu + M_eta*sat_s(s_Mu,sat_limit_m) + dd_Mu_Ref - s_Mu_0*M_lambda*exp(-M_lambda*Time);
-	*/
-	
 	
 	if (controlMode == "快速滑模") {
 		// 1. 快速光滑二阶滑模
@@ -151,9 +134,9 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		i_s6_Beta = i_s6_Beta * 0.995 + B_k6 * s_Beta * 0.005;
 		i_s6_Mu = i_s6_Mu * 0.995 + M_k6 * s_Mu * 0.005;
 
-		v_c(0) = dd_Alpha_Ref - A_k1 * de_Alpha - A_k2 * e_Alpha - A_k3 * pow(fabs(s_Alpha), (p1 - 1) / p1) * sat_s(s_Alpha, sat_limit_a) - A_k4 * s_Alpha - i_s5_Alpha - i_s6_Alpha - A_eta * sat_s(s_Alpha, sat_limit_a);
-		v_c(1) = dd_Beta_Ref - B_k1 * de_Beta - B_k2 * e_Beta - B_k3 * pow(fabs(s_Beta), (p1 - 1) / p1) * sat_s(s_Beta, sat_limit_b) - B_k4 * s_Beta - i_s5_Beta - i_s6_Beta - B_eta * sat_s(s_Beta, sat_limit_b);
-		v_c(2) = dd_Mu_Ref - M_k1 * de_Mu - M_k2 * e_Mu - M_k3 * pow(fabs(s_Mu), (p1 - 1) / p1) * sat_s(s_Mu, sat_limit_m) - M_k4 * s_Mu - i_s5_Mu - i_s6_Mu - M_eta * sat_s(s_Mu, sat_limit_m);
+		v_c[0] = dd_Alpha_Ref - A_k1 * de_Alpha - A_k2 * e_Alpha - A_k3 * pow(fabs(s_Alpha), (p1 - 1) / p1) * sat_s(s_Alpha, sat_limit_a) - A_k4 * s_Alpha - i_s5_Alpha - i_s6_Alpha - A_eta * sat_s(s_Alpha, sat_limit_a);
+		v_c[1] = dd_Beta_Ref - B_k1 * de_Beta - B_k2 * e_Beta - B_k3 * pow(fabs(s_Beta), (p1 - 1) / p1) * sat_s(s_Beta, sat_limit_b) - B_k4 * s_Beta - i_s5_Beta - i_s6_Beta - B_eta * sat_s(s_Beta, sat_limit_b);
+		v_c[2] = dd_Mu_Ref - M_k1 * de_Mu - M_k2 * e_Mu - M_k3 * pow(fabs(s_Mu), (p1 - 1) / p1) * sat_s(s_Mu, sat_limit_m) - M_k4 * s_Mu - i_s5_Mu - i_s6_Mu - M_eta * sat_s(s_Mu, sat_limit_m);
 	}	
 	else if (controlMode == "自适应滑模") {
 		// 2. 自适应终端滑模
@@ -178,17 +161,57 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		v_c(1) = dd_Beta_Ref - B_k1 * de_Beta - B_k2 * pow(fabs(de_Beta), a1) * sat_s(de_Beta, sat_limit_b) - B_k3 * pow(fabs(de_Beta), a2) * sat_s(de_Beta, sat_limit_b) - B_k4 * s_Beta - B_k5 * pow(fabs(s_Beta), p1) * sat_s(s_Beta, sat_limit_b) - epson * s_Beta;
 		v_c(2) = dd_Mu_Ref - M_k1 * de_Mu - M_k2 * pow(fabs(de_Mu), a1) * sat_s(de_Mu, sat_limit_m) - M_k3 * pow(fabs(de_Mu), a2) * sat_s(de_Mu, sat_limit_m) - M_k4 * s_Mu - M_k5 * pow(fabs(s_Mu), p1) * sat_s(s_Mu, sat_limit_m) - epson * s_Mu;
 	}	
-	else {
-		v_c(0) = 0;
-		v_c(1) = 0;
-		v_c(2) = 0;
+	else if (controlMode == "全局pid滑模"){
+		double A_k = 3.15, B_k = 3.15, M_k = 3.15;
+		double A_kL = 5.0625, B_kL = 5.0625, M_kL = 5.0625;
+		double A_eta = 0.2, B_eta = 0.05, M_eta = 1;
+		double A_lambda = 100, B_lambda = 100, M_lambda = 100;
+
+		//s_Alpha_0 = s_Alpha_0;
+		//s_Beta_0 = s_Beta_0;
+		//s_Mu_0 = s_Mu_0;
+		//if (Time <= 0.001)
+		//{  //定义s0=0
+		//	s_Alpha_0 = -(de_Alpha + A_k * e_Alpha);
+		//	s_Beta_0 = -(de_Beta + B_k * e_Beta);
+		//	s_Mu_0 = -(de_Mu + M_k * e_Mu);
+		//}
+
+		////构造时变滑模函数
+		//s_Alpha = A_k * e_Alpha + de_Alpha + A_kL * i_e_Alpha  + s_Alpha_0 * exp(-A_lambda * Time);
+		//s_Beta = B_k * e_Beta + de_Beta + B_kL * i_e_Beta + s_Beta_0 * exp(-B_lambda * Time);
+		//s_Mu = M_k * e_Mu + de_Mu + M_kL * i_e_Mu + s_Mu_0 * exp(-M_lambda * Time);
+
+		s_Alpha = A_k * e_Alpha + de_Alpha + A_kL * i_e_Alpha;
+		s_Beta = B_k * e_Beta + de_Beta + B_kL * i_e_Beta;
+		s_Mu = M_k * e_Mu + de_Mu + M_kL * i_e_Mu;
+
+		//计算辅助控制率
+		v_c[0] = A_kL * e_Alpha + A_k * de_Alpha + A_eta * sat_s(s_Alpha, sat_limit_a) + dd_Alpha_Ref;
+		v_c[1] = B_kL * e_Beta + B_k * de_Beta + B_eta * sat_s(s_Beta, sat_limit_b) + dd_Beta_Ref;
+		v_c[2] = M_kL * e_Mu + M_k * de_Mu + M_eta * sat_s(s_Mu, sat_limit_m) + dd_Mu_Ref;
 	}
 
-	v_c *= -1;
+	//v_c *= -1;
+	//std::cout << v_c.transpose() << " ";
+	if (Time > 10) {
+		if (situation == "舵面损伤") {
+
+			v_c[0] *= Model_Config.DecreaseFactor;
+			/*Delta[1] = 0.5 * Delta[1];
+			Delta[2] = 0.4 * Delta[2];*/
+		}
+		/*else if (situation == "舵面卡死") {
+			Delta[0] = Delta[0] + Model_Config.BiasFactor / rad;
+			Delta[1] = Delta[1];
+			Delta[2] = Delta[2];
+		}*/
+		//std::cout << v_c.transpose() << endl;
+	}
 	
+
 	// 计算行列式
 	double determinant = E_Back.determinant();
-	//std::cout << "Determinant: " << determinant << std::endl;
 
 	// 检查矩阵是否可逆
 	if (determinant == 0.0) {
@@ -196,109 +219,55 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	}
 
 	Eigen::Matrix3d E_Inv = E_Back.inverse();	// 计算E逆
-	M_control = E_Inv * (v_c - F_Back);				// 计算E逆*（v-F）得到控制力矩
+	 //M_control = E_Inv * (v_c - F_Back);				// 计算E逆 *（v-F）得到控制力矩
+	M_control = E_Inv.transpose() * (v_c - F_Back);				// 计算E逆 *（v-F）得到控制力矩
 
 	
 	/************************************************** 控制分配 **************************************************************/
 	// 舵偏计算    执行机构指令限幅
 	double q_dyn = 0.5 * V * V * rho;			// 计算动压
-	Eigen::Vector3d expected_dd_x_y_z = -v_c;
-	Eigen::Vector3d inertia(Jx, Jy, Jz);
-	Eigen::Array3d expected_Moment = expected_dd_x_y_z.array() * inertia.array();
+	vector<vector<double>> CoefficientDerivative(6, vector<double>(7, 0));
+	getCoefficientsDerivative(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, CoefficientDerivative);
+
+	// 期望的由舵产生的力矩
+	Eigen::Vector3d temp = Eigen::Vector3d::Zero();
+	temp(0) = M_control(0) - q_dyn * B * S * CoefficientDerivative[3][6];
+	temp(1) = M_control(1) - q_dyn * S * (C * CoefficientDerivative[4][5] + Xcg * (CoefficientDerivative[0][0] * sin(Alpha) + CoefficientDerivative[2][0] * cos(Alpha)));
+	temp(2) = M_control(2) - q_dyn * S * (B * CoefficientDerivative[5][6] + Xcg * CoefficientDerivative[1][0] * Beta);
+
+	printf("期望虚拟控制:%f %f %f \n", v_c(0), v_c(1), v_c(2));
+	printf("期望控制力矩:%f %f %f 期望舵产生的力矩:%f %f %f \n", M_control(0), M_control(1), M_control(2), temp(0), temp(1), temp(2));
+
+	// 控制效率矩阵(对每个舵的导数)
+	Eigen::Matrix3d gDelta = Eigen::Matrix3d::Zero();
+	gDelta(0, 0) = q_dyn * B * S * CoefficientDerivative[3][1];
+	gDelta(0, 1) = q_dyn * S * (C * CoefficientDerivative[4][1] + Xcg * (CoefficientDerivative[0][1] * sin(Alpha) + CoefficientDerivative[2][1] * cos(Alpha)));
+	gDelta(0, 2) = q_dyn * S * (B * CoefficientDerivative[5][1] + Xcg * CoefficientDerivative[1][1]);
+	gDelta(1, 0) = q_dyn * B * S * CoefficientDerivative[3][2];
+	gDelta(1, 1) = q_dyn * S * (C * CoefficientDerivative[4][2] + Xcg * (CoefficientDerivative[0][2] * sin(Alpha) + CoefficientDerivative[2][2] * cos(Alpha)));
+	gDelta(1, 2) = q_dyn * S * (B * CoefficientDerivative[5][2] + Xcg * CoefficientDerivative[1][2]);
+	gDelta(2, 0) = q_dyn * B * S * CoefficientDerivative[3][3];
+	gDelta(2, 1) = q_dyn * S * (C * CoefficientDerivative[4][3] + Xcg * CoefficientDerivative[0][3]);
+	gDelta(2, 2) = q_dyn * S * (B * CoefficientDerivative[5][3] + Xcg * CoefficientDerivative[1][3]);
+
+	Eigen::Matrix3d g_Inv = gDelta.inverse();
+
+	Eigen::Vector3d expected_delta = g_Inv.transpose() * temp;
+	printf("期望舵角:%f %f %f \n", expected_delta(0), expected_delta(1), expected_delta(2));
+
+	/*if (Vehicle_State.Time > 20) {
+		expected_delta[0] *= 0.9;
+	}*/
+
+	// 幅值和速度限制
+	Delta[0] = limit(expected_delta[0], Delta[0], Model_Config.delta_limit, Model_Config.d_delta_limit);
+	Delta[1] = limit(expected_delta[1], Delta[1], Model_Config.delta_limit, Model_Config.d_delta_limit);
+	Delta[2] = limit(expected_delta[2], Delta[2], Model_Config.delta_limit, Model_Config.d_delta_limit);
 	
-	
-	double delta = 0.01;
-	vector<double> C_mxyz0(6);
-	CoefficientsSixDoF_FandM(Ma, Alpha, Beta, 0, 0, 0, C, B, V, 0, 0, 0, C_mxyz0);
-	vector<double> B_C_myz_da(6);
-	CoefficientsSixDoF_FandM(Ma, Alpha, Beta, 0, delta, 0, C, B, V, 0, 0, 0, B_C_myz_da);
-	vector<double> B_C_myz_dr(6);
-	CoefficientsSixDoF_FandM(Ma, Alpha, Beta, 0, 0, delta, C, B, V, 0, 0, 0, B_C_myz_dr);
-	vector<double> B_C_myz_de(6);
-	CoefficientsSixDoF_FandM(Ma, Alpha, Beta, delta, 0, 0, C, B, V, 0, 0, 0, B_C_myz_de);
-
-	Eigen::Map<Eigen::VectorXd> C_mxyz0_vec(C_mxyz0.data(), C_mxyz0.size());
-	Eigen::Map<Eigen::VectorXd> B_C_myz_da_vec(B_C_myz_da.data(), B_C_myz_da.size());
-	Eigen::Map<Eigen::VectorXd> B_C_myz_dr_vec(B_C_myz_dr.data(), B_C_myz_dr.size());
-	Eigen::Map<Eigen::VectorXd> B_C_myz_de_vec(B_C_myz_de.data(), B_C_myz_de.size());
-
-	B_C_myz_da_vec -= C_mxyz0_vec;
-	B_C_myz_dr_vec -= C_mxyz0_vec;
-	B_C_myz_de_vec -= C_mxyz0_vec;
-
-	// 求在当前情况下气动系数关于delta_a, delta_r, delta_e的导数
-	// 第一行是C_mx^(delta_a) C_my^(delta_a) C_mz^(delta_a)
-	// 第二行是C_mx^(delta_r) C_my^(delta_r) C_mz^(delta_r)
-	// 第三行是C_mx^(delta_e) C_my^(delta_e) C_mz^(delta_e)
-	vector<vector<double>> B_C_myz(3, vector<double>(3));
-	for (int i = 0; i < 3; ++i) {
-		B_C_myz[i][0] = B_C_myz_da_vec(i + 3) / delta;
-		B_C_myz[i][1] = B_C_myz_dr_vec(i + 3) / delta;
-		B_C_myz[i][2] = B_C_myz_de_vec(i + 3) / delta;
-	}
-	vector<vector<double>> D_B_C_myz(3, vector<double>(3));
-	for (int i = 0; i < 3; ++i) {
-		D_B_C_myz[i][i] = B_C_myz[i][i];
-	}
-	vector<vector<double>> Inv_D_B_C_myz(D_B_C_myz);
-	for (int i = 0; i < 3; ++i) {
-		Inv_D_B_C_myz[i][i] = 1 / D_B_C_myz[i][i];
-	}
-	for (int i = 0; i < 3; ++i) {
-		expected_Moment[i] /= q_dyn * S * B;
-		expected_Moment[i] -= C_mxyz0[i + 3];
-	}
-	vector<double> expected_Delta(3);
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			expected_Delta[i] += Inv_D_B_C_myz[i][j] * expected_Moment[j];
-		}
-	}
-
-	double delta_aileron = expected_Delta[0];
-	double delta_rudder = expected_Delta[1];
-	double delta_elevator = expected_Delta[2];
-
-	Delta[0] = limit(delta_elevator, -Model_Config.delta_e_limit, Model_Config.delta_e_limit);
-	Delta[1] = limit(delta_aileron, -Model_Config.delta_a_limit, Model_Config.delta_a_limit);
-	Delta[2] = limit(delta_rudder, -Model_Config.delta_r_limit, Model_Config.delta_r_limit);
-
-	// 这是舵面角的幅值限制，还需要添加舵面角的角速度限制不能超过 200deg/s
-
-	if (situation == " ") {
-		Delta[0] = 20 / rad + Delta[0];
-		Delta[1] = 10 * Delta[1];
-		Delta[2] = -10 /rad + 3 * Delta[2];
-	}
-	else {
-		Delta[0] = -20 / rad + Delta[0];
-		Delta[1] = -15 / rad + 10 * Delta[1];
-		Delta[2] = 3 * Delta[2];
-	}
-	
-	
-	if (situation == "舵面损伤") {
-		if (Time > 10 && Time < 10.2) {
-			Delta[0] += 1.0 * (rand() % 100) / 15 / rad;
-			Delta[1] += 1.0 * (rand() % 100) / 15 / rad;
-			Delta[2] += 1.0 * (rand() % 100) / 15 / rad;
-		}
-	}
-	else if (situation == "舵面卡死") {
-		if (Time > 10 && Time < 10.2) {
-			Delta[1] += 1.0 * (rand() % 100) / 15 / rad;
-			Delta[2] += 1.0 * (rand() % 100) / 15 / rad;
-		}
-		if (Time > 10) {
-			Delta[1] += 6 / rad;
-			Delta[2] += -16 / rad;
-		}
-		if (Time > 10.2) Delta[2] += 2 / rad;
-	}
-	
-	if (situation == " ") {
-		vector<double> C_FM(6);
-		CoefficientsSixDoF_FandM(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
+	//if (situation == "舵面损伤") {
+	if (situation == "") {
+		vector<double> C_FM(6, 0);
+		getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
 		M_c[0] = C_FM[3] * 0.5 * rho * V * V * S * B;
 		M_c[1] = C_FM[4] * 0.5 * rho * V * V * S * B;
 		M_c[2] = C_FM[5] * 0.5 * rho * V * V * S * B;
@@ -316,20 +285,6 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	de_Beta_Pre=de_Beta;
 	e_Mu_Pre=e_Mu;
 	de_Mu_Pre=de_Mu;
-
-
-	if (Time > 10) {
-		if (situation == "舵面损伤") {
-			Delta[0] = 0.6 * Delta[0];
-			Delta[1] = 0.5 * Delta[1];
-			Delta[2] = 0.4 * Delta[2];
-		}
-		else if (situation == "舵面卡死") {
-			Delta[0] = 10 / rad;
-			Delta[1] = Delta[1];
-			Delta[2] = Delta[2];
-		}
-	}
 }
 
 ControllerState::ControllerState()  //控制器状态初始化
@@ -385,7 +340,7 @@ int sgn_s(double s) //符号函数
 		return 0;
 }
 
-double sat_s(double s,double k_sat)  //饱和函数
+double sat_s(double s, double k_sat)  //饱和函数
 {
 	double d;
 	d = s / k_sat;
@@ -393,11 +348,44 @@ double sat_s(double s,double k_sat)  //饱和函数
 		return d;	
 	else		
 		return	sgn_s(s);
+		//return	tanh(s);
 	
 }
 
-double limit(double x, double Min, double Max) {
-	if (Min <= x && x <= Max) return x;
-	else if (x < Min) return Min;
-	else return Max;
+double limit(const double& x, const double& x_pre, const double& amplitude_limit, const double& velocity_limit) {
+	double velocity = (x - x_pre);		// 一个时间步的变化量
+	if (velocity >= -velocity_limit && velocity <= velocity_limit) {
+		// 检查速度限制，符合
+		if (-amplitude_limit <= x && x <= amplitude_limit) {
+			return x;
+		}
+		else if (x < -amplitude_limit) {
+			return -amplitude_limit;
+		}
+		else return amplitude_limit;
+	}
+	else if (velocity < -velocity_limit) {
+		// 调整 x 以满足速度下限
+		double new_x = x_pre - velocity_limit;
+		// 再检查幅值限制
+		if (-amplitude_limit <= new_x && new_x <= amplitude_limit) {
+			return new_x;
+		}
+		else if (new_x < -amplitude_limit) {
+			return -amplitude_limit;
+		}
+		else return amplitude_limit;
+	}
+	else {
+		// 调整 x 以满足速度上限
+		double new_x = x_pre + velocity_limit;
+		// 再检查幅值限制
+		if (-amplitude_limit <= new_x && new_x <= amplitude_limit) {
+			return new_x;
+		}
+		else if (new_x < -amplitude_limit) {
+			return -amplitude_limit;
+		}
+		else return amplitude_limit;
+	}
 }

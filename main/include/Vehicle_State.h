@@ -3,6 +3,7 @@
 #define _VEHICLE_STATE_H
 
 #include <Global.h>
+#include <Controller_State.h>
 
 class ControllerState;
 struct VehiclePara;
@@ -24,6 +25,7 @@ public:
 	double Y;
 	double Z;			// 地面坐标系下起始位置高度为-h
 
+	// 基本单位都是弧度 rad
 	double Gamma;		// 弹道倾角
 	double Chi;			// 弹道偏角
 
