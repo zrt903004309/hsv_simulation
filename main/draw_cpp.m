@@ -17,11 +17,14 @@ T=data2(:,1);           V=data2(:,2);           Ma=data2(:,3);
 Alpha=data2(:,4);       Beta=data2(:,5);        Mu=data2(:,6);
 X=data2(:,7);           Y=data2(:,8);           Z=data2(:,9);
 Alpha_ref=data2(:,10);   Beta_ref=data2(:,11);    Mu_ref=data2(:,12);
+Gamma = data2(:, 13);   Chi = data2(:, 14);
+p = data2(:, 15);       q = data2(:, 16);       r = data2(:, 17);
 
 % index = find(abs(Alpha - 3) >= 0.05 * abs(3 - Alpha(1)), 1, 'last');
 % settling_time = T(index);
 % disp(['调节时间为：', num2str(settling_time), ' 秒']);
 
+% fig1 - 三通道姿态角与参考姿态角
 figure;
 subplot(3, 1, 1);
 plot(T, Alpha, 'r', T, Alpha_ref, 'b--', 'LineWidth', 1.5);
@@ -45,7 +48,7 @@ if num == 2
     xlim([9.5,12]);
 end
 
-% 
+% fig2 - 三通道滑模函数
 if num == 2
     figure;
     subplot(3, 1, 1);
@@ -62,6 +65,7 @@ if num == 2
     axis
 end
 
+% fig3 - 三个舵偏角
 figure;
 subplot(3, 1, 1);
 plot(T, Delta_1, 'r', 'LineWidth', 1.5);
@@ -90,10 +94,43 @@ if num == 2
     xlabel('t/s');
 end
 
+% fig4 - 速度变化曲线
+figure;
+plot(T,V,'r--');
+legend('V');
 
-% figure;
-% plot(x_T,y_X,'r--');
-% legend('X');
+% fig5 - 三轴位置变化曲线
+figure;
+plot3(X, Y, -Z, 'b-', 'LineWidth', 0.8, 'MarkerSize', 8);
+
+% 设置坐标轴标签和标题
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+title('三维曲线图');
+
+% 显示网格线
+grid on;
+
+% fig6 - p q r曲线
+figure;
+subplot(3, 1, 1);
+plot(T, p, 'r', 'LineWidth', 1.5);
+ylabel('p');
+legend('角加速度');
+subplot(3, 1, 2);
+plot(T, q, 'r',  'LineWidth', 1.5);
+ylabel('q');
+subplot(3, 1, 3);
+plot(T, r, 'r',  'LineWidth', 1.5);
+ylabel('r');
+xlabel('t/s');
+
+% fig7 - 航迹角
+figure;
+plot(T,Gamma,'r-',T,Chi,'m-');
+legend('Gamma','Chi');grid on;
+
 % figure;
 % plot(x_T,y_Y,'r--');
 % legend('Y');

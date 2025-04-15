@@ -8,6 +8,7 @@ using namespace std;
 
 void main()
 {
+	//loadAeroCoefficients(0.05, 0.05);			// 如果需要产生气动系数画图，注释其他所有文件只运行此函数
 	ModelConfig mconfig;						// 仿真模型参数初始化
 
 	// 定义飞行器状态与初始化
@@ -29,9 +30,6 @@ void main()
 	// 在默认路径下(也可修改路径)，以写入方式打开txt用于记录数据，若不存在该txt则会自动生成
 	File_Vehicle = fopen(mconfig.vehicle_filename.c_str(), "w");
     File_Control = fopen(mconfig.control_filename.c_str(), "w");
-	
-	//printf(controlMode);
-	//printf(situation);
 
 	start = clock();  //开始计时
 	for(unsigned int i = 1; i <= mconfig.iters; i++)
@@ -43,6 +41,7 @@ void main()
 			Record(Vehicle_State, Controller_State, Guidance_State, File_Vehicle, File_Control);  // 记录所得数据，输出txt
 		}
 		// 飞行器状态更新。输入为飞行器状态、控制器状态、飞行器参数、仿真步长。输出为飞行器状态
+		//Record(Vehicle_State, Controller_State, Guidance_State, File_Vehicle, File_Control);  // 记录所得数据，输出txt
 		Vehicle_State.Vehicle_State_Update(Controller_State, Vehicle_Para, mconfig.step);
 	}
 	stop = clock();  // 结束计时
