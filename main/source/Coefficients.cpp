@@ -15,27 +15,27 @@ void getCoefficients(
 	const double& omega_z, 
 	vector<double>& ans) {
 
-	// ºÍ¡¶Six DoF Nonlinear Equations of Motion for a Generic Hypersonic Vehicle¡·ÖĞµÄ×óÓÒ½óÒíÏà·´
-	// delta_a¶ÔÓ¦ ÓÒÉı½µ¸±Òí delta_e¶ÔÓ¦ ×óÉı½µ¸±Òí delta_r ¶ÔÓ¦ ·½Ïò¶æ
+	// å’Œã€ŠSix DoF Nonlinear Equations of Motion for a Generic Hypersonic Vehicleã€‹ä¸­çš„å·¦å³è¥Ÿç¿¼ç›¸å
+	// delta_aå¯¹åº” å³å‡é™å‰¯ç¿¼ delta_eå¯¹åº” å·¦å‡é™å‰¯ç¿¼ delta_r å¯¹åº” æ–¹å‘èˆµ
 
-	// ÕâÀïÎªÊ²Ã´Òª½øĞĞ½Ç¶ÈµÄÒ»¸ö¼òµ¥Ó³Éä£¿
-	// ÒòÎª¿ØÖÆÂÉ¼ÆËã³öµÄÊÇÈıÍ¨µÀĞéÄâ¿ØÖÆÁ¿(µÈĞ§¶æÆ«)£¬Õë¶Ôalpha£¬beta£¬muÈıÍ¨µÀ£¬
-	// µ«ÊÇ¼ÆËãÆø¶¯ÏµÊıĞèÒªµÄÊÇ·ÉĞĞÆ÷µÄ¿É²Ù¿Ø¶æÃæ(Êµ¼Ê¶æÆ«)£¬ËùÒÔÕâÁ½¸öÖ®¼äÓĞ¸ö×ª»»¾ØÕó
+	// è¿™é‡Œä¸ºä»€ä¹ˆè¦è¿›è¡Œè§’åº¦çš„ä¸€ä¸ªç®€å•æ˜ å°„ï¼Ÿ
+	// å› ä¸ºæ§åˆ¶å¾‹è®¡ç®—å‡ºçš„æ˜¯ä¸‰é€šé“è™šæ‹Ÿæ§åˆ¶é‡(ç­‰æ•ˆèˆµå)ï¼Œé’ˆå¯¹alphaï¼Œbetaï¼Œmuä¸‰é€šé“ï¼Œ
+	// ä½†æ˜¯è®¡ç®—æ°”åŠ¨ç³»æ•°éœ€è¦çš„æ˜¯é£è¡Œå™¨çš„å¯æ“æ§èˆµé¢(å®é™…èˆµå)ï¼Œæ‰€ä»¥è¿™ä¸¤ä¸ªä¹‹é—´æœ‰ä¸ªè½¬æ¢çŸ©é˜µ
 
-	// double RE = Delta_a - Delta_e;		// Right Elevon ÓÒ½óÒí
-	// double LE = -Delta_a - Delta_e;		// Left Elevon ×ó½óÒí
+	// double RE = Delta_a - Delta_e;		// Right Elevon å³è¥Ÿç¿¼
+	// double LE = -Delta_a - Delta_e;		// Left Elevon å·¦è¥Ÿç¿¼
 	// double RUD = Delta_r;
-	//double RE = Delta_phi - Delta_alpha;		// Right Elevon ÓÒ½óÒí
-	//double LE = -Delta_phi - Delta_alpha;		// Left Elevon ×ó½óÒí
+	//double RE = Delta_phi - Delta_alpha;		// Right Elevon å³è¥Ÿç¿¼
+	//double LE = -Delta_phi - Delta_alpha;		// Left Elevon å·¦è¥Ÿç¿¼
 	//double RUD = -Delta_beta;
-	double LE = Delta_e;		// Left Elevon ×ó½óÒí
-	double RE = Delta_a;		// Right Elevon ÓÒ½óÒí
+	double LE = Delta_e;		// Left Elevon å·¦è¥Ÿç¿¼
+	double RE = Delta_a;		// Right Elevon å³è¥Ÿç¿¼
 	double RUD = Delta_r;
 
 	double CLbv, CL_RE, CL_LE, CDbv, CD_RE, CD_LE, CD_RUD, CYB, CY_RE, CY_LE, CY_RUD;
 	double Cllbv, Cll_RE, Cll_LE, Cll_RUD, Cllr, Cllp, Cnbv, Cn_RE, Cn_LE, Cn_RUD, Cnp, Cnr, Cmbv, Cm_RE, Cm_LE, Cm_RUD, Cm_q;
 	if (Mach < 0 || Mach > 30) {
-		std::cout << Delta_e << " " << Mach << "×¹»ÙÁË" << endl;
+		std::cout << Delta_e << " " << Mach << "å æ¯äº†" << endl;
 		exit(1);
 	}
 	else if (Mach <= 1.25) {
@@ -669,39 +669,39 @@ void getCoefficients(
 			+ 1.69E-04 * pow(Alpha, 4) + 1.71E-06 * pow(Mach, 5) - 5.93E-06 * pow(Alpha, 5);
 	}
 
-	// drag force Ç£ÒıÁ¦ xÖá
+	// drag force ç‰µå¼•åŠ› xè½´
 	double CD = CDbv + CD_RE + CD_LE + CD_RUD;
-	// lift force ÉıÁ¦ zÖá
+	// lift force å‡åŠ› zè½´
 	double CL = CLbv + CL_RE + CL_LE;
-	// side force ²àÏòÁ¦ yÖá
+	// side force ä¾§å‘åŠ› yè½´
 	double CN = CYB * Beta + CY_RE + CY_LE + CY_RUD;
-	// rolling moment ¹ö×ªÁ¦¾Ø ÈÆxÖá ¸Ä±ä¹ö×ª½ÇËÙ¶Èp
+	// rolling moment æ»šè½¬åŠ›çŸ© ç»•xè½´ æ”¹å˜æ»šè½¬è§’é€Ÿåº¦p
 	double mx = Cllbv * Beta + Cll_RE + Cll_LE + Cll_RUD + (Cllp * omega_x + Cllr * omega_z) * B / (2 * Vel);
-	// pitching moment ¸©ÑöÁ¦¾Ø ÈÆyÖá ¸Ä±ä¸©Ñö½ÇËÙ¶Èq
+	// pitching moment ä¿¯ä»°åŠ›çŸ© ç»•yè½´ æ”¹å˜ä¿¯ä»°è§’é€Ÿåº¦q
 	double my = Cmbv + Cm_RE + Cm_LE + Cm_RUD + Cm_q * omega_y * C / (2 * Vel); 
-	// yawing moment Æ«º½Á¦¾Ø ÈÆzÖá ¸Ä±äÆ«º½¼ÓËÙ¶Èr
+	// yawing moment åèˆªåŠ›çŸ© ç»•zè½´ æ”¹å˜åèˆªåŠ é€Ÿåº¦r
 	double mz = Cnbv * Beta + Cn_RE + Cn_LE + Cn_RUD + (Cnp * omega_x + Cnr * omega_z) * B / (2 * Vel);
 
 	ans[0] = CD;
 	ans[1] = CL;
 	ans[2] = CN;
-	ans[3] = mx;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµxÖáµÄ×ª¶¯£¬²úÉú¹ö×ª½ÇËÙ¶Èp
-	ans[4] = my;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµyÖáµÄ×ª¶¯£¬²úÉú¸©Ñö½ÇËÙ¶Èq
-	ans[5] = mz;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµzÖáµÄ×ª¶¯£¬²úÉúÆ«º½½ÇËÙ¶Èr
+	ans[3] = mx;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»xè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿæ»šè½¬è§’é€Ÿåº¦p
+	ans[4] = my;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»yè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿä¿¯ä»°è§’é€Ÿåº¦q
+	ans[5] = mz;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»zè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿåèˆªè§’é€Ÿåº¦r
 
 	return;
 }
 
 void getCoefficientsDetails(const double& Mach, const double& Alpha, const double& Beta, const double& Delta_e, const double& Delta_a, const double& Delta_r, const double& C, const double& B, const double& Vel, const double& omega_x, const double& omega_y, const double& omega_z, vector<vector<double>>& ans)
 {
-	double LE = Delta_e;		// Left Elevon ×ó½óÒí
-	double RE = Delta_a;		// Right Elevon ÓÒ½óÒí
+	double LE = Delta_e;		// Left Elevon å·¦è¥Ÿç¿¼
+	double RE = Delta_a;		// Right Elevon å³è¥Ÿç¿¼
 	double RUD = Delta_r;
 
 	double CLbv, CL_RE, CL_LE, CDbv, CD_RE, CD_LE, CD_RUD, CYB, CY_RE, CY_LE, CY_RUD;
 	double Cllbv, Cll_RE, Cll_LE, Cll_RUD, Cllr, Cllp, Cnbv, Cn_RE, Cn_LE, Cn_RUD, Cnp, Cnr, Cmbv, Cm_RE, Cm_LE, Cm_RUD, Cm_q;
 	if (Mach < 0 || Mach > 30) {
-		std::cout << Delta_e << " " << Mach << "×¹»ÙÁË" << endl;
+		std::cout << Delta_e << " " << Mach << "å æ¯äº†" << endl;
 		exit(1);
 	}
 	else if (Mach <= 1.25) {
@@ -1335,52 +1335,52 @@ void getCoefficientsDetails(const double& Mach, const double& Alpha, const doubl
 			+ 1.69E-04 * pow(Alpha, 4) + 1.71E-06 * pow(Mach, 5) - 5.93E-06 * pow(Alpha, 5);
 	}
 
-	// drag force Ç£ÒıÁ¦ xÖá
+	// drag force ç‰µå¼•åŠ› xè½´
 	double CD = CDbv + CD_RE + CD_LE + CD_RUD;
-	// lift force ÉıÁ¦ zÖá
+	// lift force å‡åŠ› zè½´
 	double CL = CLbv + CL_RE + CL_LE;
-	// side force ²àÏòÁ¦ yÖá
+	// side force ä¾§å‘åŠ› yè½´
 	double CN = CYB * Beta + CY_RE + CY_LE + CY_RUD;
-	// rolling moment ¹ö×ªÁ¦¾Ø ÈÆxÖá ¸Ä±ä¹ö×ª½ÇËÙ¶Èp
+	// rolling moment æ»šè½¬åŠ›çŸ© ç»•xè½´ æ”¹å˜æ»šè½¬è§’é€Ÿåº¦p
 	double mx = Cllbv * Beta + Cll_RE + Cll_LE + Cll_RUD + (Cllp * omega_x + Cllr * omega_z) * B / (2 * Vel);
-	// pitching moment ¸©ÑöÁ¦¾Ø ÈÆyÖá ¸Ä±ä¸©Ñö½ÇËÙ¶Èq
+	// pitching moment ä¿¯ä»°åŠ›çŸ© ç»•yè½´ æ”¹å˜ä¿¯ä»°è§’é€Ÿåº¦q
 	double my = Cmbv + Cm_RE + Cm_LE + Cm_RUD + Cm_q * omega_y * C / (2 * Vel);
-	// yawing moment Æ«º½Á¦¾Ø ÈÆzÖá ¸Ä±äÆ«º½¼ÓËÙ¶Èr
+	// yawing moment åèˆªåŠ›çŸ© ç»•zè½´ æ”¹å˜åèˆªåŠ é€Ÿåº¦r
 	double mz = Cnbv * Beta + Cn_RE + Cn_LE + Cn_RUD + (Cnp * omega_x + Cnr * omega_z) * B / (2 * Vel);
 
 	ans[0][0] = CDbv;		ans[0][1] = CD_LE;		ans[0][2] = CD_RE;		ans[0][3] = CD_RUD;
 	ans[1][0] = CLbv;		ans[1][1] = CL_LE;		ans[1][0] = CL_RE;
 	ans[2][0] = CYB;		ans[2][1] = CY_LE;		ans[2][2] = CY_RE;		ans[2][2] = CY_RUD;
-	ans[3][0] = Cllbv;		ans[3][1] = Cll_LE;		ans[3][2] = Cll_RE;		ans[3][3] = Cll_RUD;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµxÖáµÄ×ª¶¯£¬²úÉú¹ö×ª½ÇËÙ¶Èp
-	ans[4][0] = Cmbv;		ans[4][1] = Cm_LE;		ans[4][2] = Cm_RE;		ans[4][3] = Cm_RUD;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµyÖáµÄ×ª¶¯£¬²úÉú¸©Ñö½ÇËÙ¶Èq
-	ans[5][0] = Cnbv;		ans[5][1] = Cn_LE;		ans[5][2] = Cn_RE;		ans[5][3] = Cn_RUD;	// ÒıÆğÏà¶ÔÓÚ»úÌå×ø±êÏµzÖáµÄ×ª¶¯£¬²úÉúÆ«º½½ÇËÙ¶Èr
+	ans[3][0] = Cllbv;		ans[3][1] = Cll_LE;		ans[3][2] = Cll_RE;		ans[3][3] = Cll_RUD;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»xè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿæ»šè½¬è§’é€Ÿåº¦p
+	ans[4][0] = Cmbv;		ans[4][1] = Cm_LE;		ans[4][2] = Cm_RE;		ans[4][3] = Cm_RUD;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»yè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿä¿¯ä»°è§’é€Ÿåº¦q
+	ans[5][0] = Cnbv;		ans[5][1] = Cn_LE;		ans[5][2] = Cn_RE;		ans[5][3] = Cn_RUD;	// å¼•èµ·ç›¸å¯¹äºæœºä½“åæ ‡ç³»zè½´çš„è½¬åŠ¨ï¼Œäº§ç”Ÿåèˆªè§’é€Ÿåº¦r
 
 	return;
 }
 
 void loadAeroCoefficients(const double& Mach_step, const double& Alpha_step)
 {
-	// Çå¿ÕÓÃÓÚ¼ÇÂ¼µÄtxt
+	// æ¸…ç©ºç”¨äºè®°å½•çš„txt
 	FILE* File = NULL;
 
-	// ÔÚÄ¬ÈÏÂ·¾¶ÏÂ(Ò²¿ÉĞŞ¸ÄÂ·¾¶)£¬ÒÔĞ´Èë·½Ê½´ò¿ªtxtÓÃÓÚ¼ÇÂ¼Êı¾İ£¬Èô²»´æÔÚ¸ÃtxtÔò»á×Ô¶¯Éú³É
+	// åœ¨é»˜è®¤è·¯å¾„ä¸‹(ä¹Ÿå¯ä¿®æ”¹è·¯å¾„)ï¼Œä»¥å†™å…¥æ–¹å¼æ‰“å¼€txtç”¨äºè®°å½•æ•°æ®ï¼Œè‹¥ä¸å­˜åœ¨è¯¥txtåˆ™ä¼šè‡ªåŠ¨ç”Ÿæˆ
 	File = fopen("../data/aero_coefficients.txt", "w");
 
 	double Ma = 5, Alpha = -5;
 	vector<vector<double>> aero(6, vector<double>(4, 0));
 
-	// ´ò1500¸öµã
+	// æ‰“1500ä¸ªç‚¹
 	for (int i = 0; i < 301; i++) {
 		Alpha = -5;
 		for (int j = 0; j < 301; j++) {
 			getCoefficientsDetails(Ma, Alpha, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, aero);
-			// ¹¥½ÇÒıÆğµÄ×èÁ¦ÏµÊı ¹¥½ÇÒıÆğµÄÉıÁ¦ÏµÊı ¹¥½ÇÒıÆğµÄ¸©ÑöÁ¦¾ØÏµÊı Éı×è±È 
+			// æ”»è§’å¼•èµ·çš„é˜»åŠ›ç³»æ•° æ”»è§’å¼•èµ·çš„å‡åŠ›ç³»æ•° æ”»è§’å¼•èµ·çš„ä¿¯ä»°åŠ›çŸ©ç³»æ•° å‡é˜»æ¯” 
 			fprintf(File, "%.7f %.7f %.7f %.7f %.7f %.7f ", Ma, Alpha, aero[0][0], aero[1][0], aero[4][0], aero[1][0] / aero[0][0]);
 			getCoefficientsDetails(Ma, Alpha, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, aero);
-			// ×ó¶æ10¶ÈÒıÆğµÄÈıÖáÁ¦¾ØÏµÊı
+			// å·¦èˆµ10åº¦å¼•èµ·çš„ä¸‰è½´åŠ›çŸ©ç³»æ•°
 			fprintf(File, "%.7f %.7f %.7f ", aero[3][1], aero[4][1], aero[5][1]);
 			getCoefficientsDetails(Ma, Alpha, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, aero);
-			// ·½Ïò¶æ10¶ÈÒıÆğµÄÈıÖáÁ¦¾ØÏµÊı
+			// æ–¹å‘èˆµ10åº¦å¼•èµ·çš„ä¸‰è½´åŠ›çŸ©ç³»æ•°
 			fprintf(File, "%.7f %.7f %.7f\n", aero[3][3], aero[4][3], aero[5][3]);
 			Alpha += Alpha_step;
 		}
