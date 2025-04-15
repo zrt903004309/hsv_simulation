@@ -1,12 +1,12 @@
 #include <Record.h>
-//¼ÇÂ¼Êı¾İ
+//è®°å½•æ•°æ®
 void Record(const VehicleState& Vehicle_State, const ControllerState& Controller_State, const GuidanceState Guidance_State, FILE *File_Vehicle, FILE *File_Control)
 {
 	double X, Y, Z, V, Ma, Gamma, Chi, Alpha, Beta, Mu, p, q, r, Time, Var_theta, Psi, Phi_b;
-	// ¿ØÖÆ±äÁ¿
+	// æ§åˆ¶å˜é‡
 	vector<double> Delta(3, 0), M_c(3, 0);
 	double s_Alpha, s_Beta, s_Mu;
-	// ¸ú×Ù×ËÌ¬
+	// è·Ÿè¸ªå§¿æ€
 	double alpha_ref, beta_ref, mu_ref;
 
 	Time      = Vehicle_State.Time;
