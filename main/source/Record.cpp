@@ -43,9 +43,9 @@ void Record(const VehicleState& Vehicle_State, const ControllerState& Controller
 	beta_ref  = Guidance_State.beta_ref;
 	mu_ref    = Guidance_State.mu_ref;
 
-	fprintf(File_Vehicle,"%.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f\n",
-		Time, V, Ma, Alpha*rad, Beta*rad, Mu*rad, X, Y, Z, alpha_ref * rad, beta_ref * rad, mu_ref * rad, Gamma * rad, Chi * rad, p, q, r);
+	fprintf(File_Vehicle,"%.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f\n",
+		Time, V, Ma, Alpha*rad, Beta*rad, Mu*rad, X, Y, Z, alpha_ref * rad, beta_ref * rad, mu_ref * rad);
 
-	fprintf(File_Control,"%.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f \n",
+	fprintf(File_Control,"%.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f\n",
 		Delta[0], Delta[1], Delta[2], s_Alpha, s_Beta, s_Mu, M_c[0], M_c[1], M_c[2]);
 }

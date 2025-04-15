@@ -6,7 +6,7 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	double M_X, M_Y, M_Z;
 	double d_X, d_Y, d_Z, d_V, d_Gamma, d_Chi, d_Alpha,d_Beta, d_Mu, d_p, d_q, d_r, d_Var_theta, d_Psi, d_Phi_b;
 	vector<double> Delta(3, 0.0), M_c(3, 0.0);
-	double Mass, Jx, Jy, Jz, C, B, S, Xcg;
+	double Mass, Jx, Jy, Jz, C, B, S;
 	
 	// 读飞行器参数
 	Mass = Vehicle_Para.Mass;
@@ -16,12 +16,16 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	B = Vehicle_Para.B;
 	C = Vehicle_Para.C;
 	S = Vehicle_Para.S;
-	Xcg = Vehicle_Para.Xcg;
 	
 	// 读控制器状态
 	Delta[0] = Controller_State.Delta[0];
 	Delta[1] = Controller_State.Delta[1];
 	Delta[2] = Controller_State.Delta[2];
+
+	// 读力矩
+	M_c[0] = Controller_State.M_c[0];
+	M_c[1] = Controller_State.M_c[1];
+	M_c[2] = Controller_State.M_c[2];
 
 	// 所有单位原始情况都是弧度制，公式中需要的是角度制
 	vector<double> C_FM(6);
@@ -33,9 +37,6 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	M_X = C_FM[3] * 0.5 * rho * V * V * S * B;
 	M_Y = C_FM[4] * 0.5 * rho * V * V * S * C;
 	M_Z = C_FM[5] * 0.5 * rho * V * V * S * B;
-
-	M_Y += Xcg * (F_D * sin(Alpha) + F_L * cos(Alpha));
-	M_Z -= Xcg * F_Y;
 
 	printf("马赫:%f 攻角:%f 侧滑角:%f 倾侧角:%f\n", Ma, Alpha*rad, Beta*rad, Mu*rad);
 	//printf("X:%f Y:%f H:%f\n",X, Y, -Z);
