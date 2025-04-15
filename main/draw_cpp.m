@@ -22,14 +22,14 @@ p = data2(:, 15);       q = data2(:, 16);       r = data2(:, 17);
 
 % index = find(abs(Alpha - 3) >= 0.05 * abs(3 - Alpha(1)), 1, 'last');
 % settling_time = T(index);
-% disp(['µ÷½ÚÊ±¼äÎª£º', num2str(settling_time), ' Ãë']);
+% disp(['è°ƒèŠ‚æ—¶é—´ä¸ºï¼š', num2str(settling_time), ' ç§’']);
 
-% fig1 - ÈıÍ¨µÀ×ËÌ¬½ÇÓë²Î¿¼×ËÌ¬½Ç
+% fig1 - ä¸‰é€šé“å§¿æ€è§’ä¸å‚è€ƒå§¿æ€è§’
 figure;
 subplot(3, 1, 1);
 plot(T, Alpha, 'r', T, Alpha_ref, 'b--', 'LineWidth', 1.5);
 ylabel('\alpha(deg)');
-legend('Êä³ö×ËÌ¬½Ç', 'ÆÚÍû×ËÌ¬½Ç');
+legend('è¾“å‡ºå§¿æ€è§’', 'æœŸæœ›å§¿æ€è§’');
 subplot(3, 1, 2);
 plot(T, Beta, 'r', T, Beta_ref, 'b--',  'LineWidth', 1.5);
 ylabel('\beta(deg)');
@@ -48,13 +48,13 @@ if num == 2
     xlim([9.5,12]);
 end
 
-% fig2 - ÈıÍ¨µÀ»¬Ä£º¯Êı
+% fig2 - ä¸‰é€šé“æ»‘æ¨¡å‡½æ•°
 if num == 2
     figure;
     subplot(3, 1, 1);
     plot(T, s_Alpha, 'r', 'LineWidth', 1.5);
     ylabel('s(\alpha)');
-    legend('×ËÌ¬½Ç»¬Ä£º¯Êı');
+    legend('å§¿æ€è§’æ»‘æ¨¡å‡½æ•°');
     subplot(3, 1, 2);
     plot(T, s_Beta, 'r',  'LineWidth', 1.5);
     ylabel('s(\beta)');
@@ -65,12 +65,12 @@ if num == 2
     axis
 end
 
-% fig3 - Èı¸ö¶æÆ«½Ç
+% fig3 - ä¸‰ä¸ªèˆµåè§’
 figure;
 subplot(3, 1, 1);
 plot(T, Delta_1, 'r', 'LineWidth', 1.5);
 ylabel('\delta_e(deg)');
-legend('¶æÃæÆ«½Ç');
+legend('èˆµé¢åè§’');
 subplot(3, 1, 2);
 plot(T, Delta_2, 'r',  'LineWidth', 1.5);
 ylabel('\delta_a(deg)');
@@ -83,41 +83,41 @@ if num == 2
     figure;
     subplot(3, 1, 1);
     plot(T, M_x, 'r', 'LineWidth', 1.5);
-    ylabel('M_x(N¡¤m)');
-    legend('Êµ¼ÊÁ¦¾Ø');
+    ylabel('M_x(NÂ·m)');
+    legend('å®é™…åŠ›çŸ©');
     subplot(3, 1, 2);
     plot(T, M_y, 'r',  'LineWidth', 1.5);
-    ylabel('M_y(N¡¤m)');
+    ylabel('M_y(NÂ·m)');
     subplot(3, 1, 3);
     plot(T, M_z, 'r',  'LineWidth', 1.5);
-    ylabel('M_z(N¡¤m)');
+    ylabel('M_z(NÂ·m)');
     xlabel('t/s');
 end
 
-% fig4 - ËÙ¶È±ä»¯ÇúÏß
+% fig4 - é€Ÿåº¦å˜åŒ–æ›²çº¿
 figure;
 plot(T,V,'r--');
 legend('V');
 
-% fig5 - ÈıÖáÎ»ÖÃ±ä»¯ÇúÏß
+% fig5 - ä¸‰è½´ä½ç½®å˜åŒ–æ›²çº¿
 figure;
 plot3(X, Y, -Z, 'b-', 'LineWidth', 0.8, 'MarkerSize', 8);
 
-% ÉèÖÃ×ø±êÖá±êÇ©ºÍ±êÌâ
+% è®¾ç½®åæ ‡è½´æ ‡ç­¾å’Œæ ‡é¢˜
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('ÈıÎ¬ÇúÏßÍ¼');
+title('ä¸‰ç»´æ›²çº¿å›¾');
 
-% ÏÔÊ¾Íø¸ñÏß
+% æ˜¾ç¤ºç½‘æ ¼çº¿
 grid on;
 
-% fig6 - p q rÇúÏß
+% fig6 - p q ræ›²çº¿
 figure;
 subplot(3, 1, 1);
 plot(T, p, 'r', 'LineWidth', 1.5);
 ylabel('p');
-legend('½Ç¼ÓËÙ¶È');
+legend('è§’åŠ é€Ÿåº¦');
 subplot(3, 1, 2);
 plot(T, q, 'r',  'LineWidth', 1.5);
 ylabel('q');
@@ -126,7 +126,7 @@ plot(T, r, 'r',  'LineWidth', 1.5);
 ylabel('r');
 xlabel('t/s');
 
-% fig7 - º½¼£½Ç
+% fig7 - èˆªè¿¹è§’
 figure;
 plot(T,Gamma,'r-',T,Chi,'m-');
 legend('Gamma','Chi');grid on;
@@ -156,15 +156,15 @@ legend('Gamma','Chi');grid on;
 % figure();
 % subplot(3, 1, 1);
 % plot(T, Alpha, 'r', T, Alpha1, 'b', T, Alpha2, 'm', T, Alpha_Ref, 'k--',  'LineWidth', 1.5);
-% ylabel('¦Á(deg)');
-% pos = legend('»ùÓÚFPSOµÄACËã·¨²ÎÊıµ÷½Ú×ËÌ¬½Ç','²ÎÊı¹Ì¶¨×ËÌ¬½Ç','ACËã·¨²ÎÊıµ÷½Ú×ËÌ¬½Ç');
+% ylabel('Î±(deg)');
+% pos = legend('åŸºäºFPSOçš„ACç®—æ³•å‚æ•°è°ƒèŠ‚å§¿æ€è§’','å‚æ•°å›ºå®šå§¿æ€è§’','ACç®—æ³•å‚æ•°è°ƒèŠ‚å§¿æ€è§’');
 % set(pos,'position',[0.55,0.73,0.3,0.1]);
 % subplot(3, 1, 2);
 % plot(T, Beta, 'r', T, Beta1, 'b', T, Beta2, 'm', T, Beta_Ref, 'k--', 'LineWidth', 1.5);
-% ylabel('¦Â(deg)');
+% ylabel('Î²(deg)');
 % subplot(3, 1, 3);
 % plot(T, Mu, 'r', T, Mu1, 'b',T, Mu2, 'm', T, Mu_Ref, 'k--', 'LineWidth', 1.5);
-% ylabel('¦Ã_c(deg)');
+% ylabel('Î³_c(deg)');
 % xlabel('t/s');
 % 
 % axes('position',[0.4 0.75 0.075 0.075]);
