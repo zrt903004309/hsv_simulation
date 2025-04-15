@@ -2,13 +2,13 @@
 
 void VehicleState::Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step)
 {
-	double F_D, F_Y, F_L;	// ×èÁ¦D£¬²àÁ¦Y£¬ÉıÁ¦L
+	double F_D, F_Y, F_L;	// é˜»åŠ›Dï¼Œä¾§åŠ›Yï¼Œå‡åŠ›L
 	double M_X, M_Y, M_Z;
 	double d_X, d_Y, d_Z, d_V, d_Gamma, d_Chi, d_Alpha,d_Beta, d_Mu, d_p, d_q, d_r, d_Var_theta, d_Psi, d_Phi_b;
 	vector<double> Delta(3, 0.0), M_c(3, 0.0);
 	double Mass, Jx, Jy, Jz, C, B, S, Xcg;
 	
-	// ¶Á·ÉĞĞÆ÷²ÎÊı
+	// è¯»é£è¡Œå™¨å‚æ•°
 	Mass = Vehicle_Para.Mass;
 	Jx = Vehicle_Para.Jx;
 	Jy = Vehicle_Para.Jy;
@@ -18,18 +18,18 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	S = Vehicle_Para.S;
 	Xcg = Vehicle_Para.Xcg;
 	
-	// ¶Á¿ØÖÆÆ÷×´Ì¬
+	// è¯»æ§åˆ¶å™¨çŠ¶æ€
 	Delta[0] = Controller_State.Delta[0];
 	Delta[1] = Controller_State.Delta[1];
 	Delta[2] = Controller_State.Delta[2];
 
-	// ËùÓĞµ¥Î»Ô­Ê¼Çé¿ö¶¼ÊÇ»¡¶ÈÖÆ£¬¹«Ê½ÖĞĞèÒªµÄÊÇ½Ç¶ÈÖÆ
+	// æ‰€æœ‰å•ä½åŸå§‹æƒ…å†µéƒ½æ˜¯å¼§åº¦åˆ¶ï¼Œå…¬å¼ä¸­éœ€è¦çš„æ˜¯è§’åº¦åˆ¶
 	vector<double> C_FM(6);
 	getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
 	F_D = C_FM[0] * 0.5 * rho * V * V * S;
 	F_L = C_FM[1] * 0.5 * rho * V * V * S;
 	F_Y = C_FM[2] * 0.5 * rho * V * V * S;
-	// ¼ÆËãÁ¦¾Ø
+	// è®¡ç®—åŠ›çŸ©
 	M_X = C_FM[3] * 0.5 * rho * V * V * S * B;
 	M_Y = C_FM[4] * 0.5 * rho * V * V * S * C;
 	M_Z = C_FM[5] * 0.5 * rho * V * V * S * B;
@@ -37,13 +37,13 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	M_Y += Xcg * (F_D * sin(Alpha) + F_L * cos(Alpha));
 	M_Z -= Xcg * F_Y;
 
-	printf("ÂíºÕ:%f ¹¥½Ç:%f ²à»¬½Ç:%f Çã²à½Ç:%f\n", Ma, Alpha*rad, Beta*rad, Mu*rad);
+	printf("é©¬èµ«:%f æ”»è§’:%f ä¾§æ»‘è§’:%f å€¾ä¾§è§’:%f\n", Ma, Alpha*rad, Beta*rad, Mu*rad);
 	//printf("X:%f Y:%f H:%f\n",X, Y, -Z);
 	//printf("p:%f q:%f r:%f \n", p, q, r);
-	//printf("×óÉı½µ¸±Òí:%f ÓÒÉı½µ¸±Òí:%f ·½Ïò¶æ:%f \n", Delta[0]*rad, Delta[1]*rad, Delta[2]*rad);
+	//printf("å·¦å‡é™å‰¯ç¿¼:%f å³å‡é™å‰¯ç¿¼:%f æ–¹å‘èˆµ:%f \n", Delta[0]*rad, Delta[1]*rad, Delta[2]*rad);
 	
 	
-	// ·ÉĞĞÆ÷ÔË¶¯·ÇÏßĞÔ·½³Ì×é
+	// é£è¡Œå™¨è¿åŠ¨éçº¿æ€§æ–¹ç¨‹ç»„
 	d_X     = V * cos(Chi) * cos(Gamma);
 	d_Y     = V * sin(Chi) * cos(Gamma);
 	d_Z     = -V * sin(Gamma);
@@ -59,12 +59,12 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 
 	//printf("%f %f %f %f %f %f %f %f %f %f %f %f\n", d_X, d_Y, d_Z, d_V, d_Gamma, d_Chi, d_Alpha, d_Beta, d_Mu, d_p, d_q, d_r);
 
-	// µØÃæ×ø±êÏµºÍ»úÌå×ø±êÏµÏÂµÄ¸©Ñö½Ç£¬Æ«º½½Ç£¬¹ö×ª½Ç¶Ô¿ØÖÆÃ»ÓĞÓÃ
+	// åœ°é¢åæ ‡ç³»å’Œæœºä½“åæ ‡ç³»ä¸‹çš„ä¿¯ä»°è§’ï¼Œåèˆªè§’ï¼Œæ»šè½¬è§’å¯¹æ§åˆ¶æ²¡æœ‰ç”¨
 	d_Var_theta = q * sin(Phi_b) / cos(Var_theta) + r * cos(Phi_b) / cos(Var_theta);
 	d_Psi = q * cos(Phi_b) - r * sin(Phi_b);
 	d_Phi_b = p + q * tan(Var_theta) * sin(Phi_b) + r * tan(Var_theta) * cos(Phi_b);
 	
-	// Å·À­·¨µÃ×´Ì¬·½³ÌÊıÖµ½â
+	// æ¬§æ‹‰æ³•å¾—çŠ¶æ€æ–¹ç¨‹æ•°å€¼è§£
 	Time  = Time + step;
 	V     = V + d_V * step;
 	Alpha = Alpha + d_Alpha * step;
@@ -82,7 +82,7 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	Psi = Psi + d_Psi * step;
 	Phi_b = Phi_b + d_Phi_b * step;
 
-	// ÊäÈë¸ß¶È£¬ÀûÓÃĞÂ¸ß¶ÈÊä³öÉùËÙa£¬ÂíºÕÊıMa£¬ÖØÁ¦¼ÓËÙ¶ÈgºÍ´óÆøÃÜ¶Èrho
+	// è¾“å…¥é«˜åº¦ï¼Œåˆ©ç”¨æ–°é«˜åº¦è¾“å‡ºå£°é€Ÿaï¼Œé©¬èµ«æ•°Maï¼Œé‡åŠ›åŠ é€Ÿåº¦gå’Œå¤§æ°”å¯†åº¦rho
 	AtmoPara atmo;
 	atmo.GetAtmoPara(-Z);
 
@@ -92,37 +92,37 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 
 }
 
-VehicleState::VehicleState(double H, double v, double alpha, double beta, double mu)  //·ÉĞĞÆ÷×´Ì¬³õÊ¼»¯
+VehicleState::VehicleState(double H, double v, double alpha, double beta, double mu)  //é£è¡Œå™¨çŠ¶æ€åˆå§‹åŒ–
 {
 	AtmoPara Atmo;
 
 	Atmo.GetAtmoPara(H);
 
-	h = H;					// ³õÊ¼¸ß¶È
-	V = v;					// ·ÉĞĞËÙ¶È
-	Time = 0.0;				// Ê±¼ä
+	h = H;					// åˆå§‹é«˜åº¦
+	V = v;					// é£è¡Œé€Ÿåº¦
+	Time = 0.0;				// æ—¶é—´
 
-	Alpha = alpha;			// ³õÊ¼¹¥½ÇÎª 2 ¶È
-	Beta = beta;			// ³õÊ¼²à»¬½ÇÎª 1 ¶È
-	Mu = mu;				// ³õÊ¼Çã²à½ÇÎª 1 ¶È
+	Alpha = alpha;			// åˆå§‹æ”»è§’ä¸º 2 åº¦
+	Beta = beta;			// åˆå§‹ä¾§æ»‘è§’ä¸º 1 åº¦
+	Mu = mu;				// åˆå§‹å€¾ä¾§è§’ä¸º 1 åº¦
 
-	Gamma = 0.0;			// µ¯µÀÇã½Ç
-	Chi = 0.0;				// µ¯µÀÆ«½Ç
+	Gamma = 0.0;			// å¼¹é“å€¾è§’
+	Chi = 0.0;				// å¼¹é“åè§’
 
-	p = 0.0 / rad;			// ¹ö×ª½ÇËÙ¶È
-	q = 0.0 / rad;			// ¸©Ñö½ÇËÙ¶È
-	r = 0.0 / rad;			// Æ«º½½ÇËÙ¶È
+	p = 0.0 / rad;			// æ»šè½¬è§’é€Ÿåº¦
+	q = 0.0 / rad;			// ä¿¯ä»°è§’é€Ÿåº¦
+	r = 0.0 / rad;			// åèˆªè§’é€Ÿåº¦
 
 	X = 0.0;
 	Y = 0.0;
-	Z = -h;					// µØÃæ×ø±êÏµÏÂÆğÊ¼Î»ÖÃ¸ß¶ÈÎª-h
+	Z = -h;					// åœ°é¢åæ ‡ç³»ä¸‹èµ·å§‹ä½ç½®é«˜åº¦ä¸º-h
 
-	Var_theta = 0.0;		// ¸©Ñö½Ç
-	Psi = 0.0;				// Æ«º½½Ç
-	Phi_b = 0.0;			// ¹ö×ª½Ç
+	Var_theta = 0.0;		// ä¿¯ä»°è§’
+	Psi = 0.0;				// åèˆªè§’
+	Phi_b = 0.0;			// æ»šè½¬è§’
 
-	Ma = V / Atmo.a;		// ÂíºÕÊı
-	rho = Atmo.rho;			// ´óÆøÃÜ¶È
-	g = Atmo.g;				// ÖØÁ¦¼ÓËÙ¶È
+	Ma = V / Atmo.a;		// é©¬èµ«æ•°
+	rho = Atmo.rho;			// å¤§æ°”å¯†åº¦
+	g = Atmo.g;				// é‡åŠ›åŠ é€Ÿåº¦
 
 }
