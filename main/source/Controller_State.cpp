@@ -191,37 +191,12 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		v_c[1] = B_kL * e_Beta + B_k * de_Beta + B_eta * sat_s(s_Beta, sat_limit_b) + dd_Beta_Ref;
 		v_c[2] = M_kL * e_Mu + M_k * de_Mu + M_eta * sat_s(s_Mu, sat_limit_m) + dd_Mu_Ref;
 	}
-
-	//v_c *= -1;
-	//std::cout << v_c.transpose() << " ";
-	if (Time > 10) {
-		if (situation == "舵面损伤") {
-
-			v_c[0] *= Model_Config.DecreaseFactor;
-			/*Delta[1] = 0.5 * Delta[1];
-			Delta[2] = 0.4 * Delta[2];*/
-		}
-		/*else if (situation == "舵面卡死") {
-			Delta[0] = Delta[0] + Model_Config.BiasFactor / rad;
-			Delta[1] = Delta[1];
-			Delta[2] = Delta[2];
-		}*/
-		//std::cout << v_c.transpose() << endl;
-	}
 	
-
 	// 计算行列式
 	double determinant = E_Back.determinant();
 
-	// 检查矩阵是否可逆
-	if (determinant == 0.0) {
-		std::cerr << "Error: The matrix is singular and cannot be inverted." << std::endl;
-	}
-
-	Eigen::Matrix3d E_Inv = E_Back.inverse();	// 计算E逆
-	 //M_control = E_Inv * (v_c - F_Back);				// 计算E逆 *（v-F）得到控制力矩
+	Eigen::Matrix3d E_Inv = E_Back.inverse();					// 计算E逆
 	M_control = E_Inv.transpose() * (v_c - F_Back);				// 计算E逆 *（v-F）得到控制力矩
-
 	
 	/************************************************** 控制分配 **************************************************************/
 	// 舵偏计算    执行机构指令限幅
@@ -233,12 +208,12 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	Eigen::Vector3d temp = Eigen::Vector3d::Zero();
 	temp(0) = M_control(0) - q_dyn * B * S * CoefficientDerivative[3][6];
 	temp(1) = M_control(1) - q_dyn * S * (C * CoefficientDerivative[4][5] + Xcg * (CoefficientDerivative[0][0] * sin(Alpha) + CoefficientDerivative[2][0] * cos(Alpha)));
-	temp(2) = M_control(2) - q_dyn * S * (B * CoefficientDerivative[5][6] + Xcg * CoefficientDerivative[1][0] * Beta);
+	temp(2) = M_control(2) - q_dyn * S * (B * CoefficientDerivative[5][6] - Xcg * CoefficientDerivative[1][0] * Beta);
 
 	printf("期望虚拟控制:%f %f %f \n", v_c(0), v_c(1), v_c(2));
 	printf("期望控制力矩:%f %f %f 期望舵产生的力矩:%f %f %f \n", M_control(0), M_control(1), M_control(2), temp(0), temp(1), temp(2));
 
-	// 控制效率矩阵(对每个舵的导数)
+	// 控制效率矩阵(对每个舵的导数)  需要修改r那一项
 	Eigen::Matrix3d gDelta = Eigen::Matrix3d::Zero();
 	gDelta(0, 0) = q_dyn * B * S * CoefficientDerivative[3][1];
 	gDelta(0, 1) = q_dyn * S * (C * CoefficientDerivative[4][1] + Xcg * (CoefficientDerivative[0][1] * sin(Alpha) + CoefficientDerivative[2][1] * cos(Alpha)));
@@ -260,10 +235,20 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	}*/
 
 	// 幅值和速度限制
-	Delta[0] = limit(expected_delta[0], Delta[0], Model_Config.delta_limit, Model_Config.d_delta_limit);
-	Delta[1] = limit(expected_delta[1], Delta[1], Model_Config.delta_limit, Model_Config.d_delta_limit);
-	Delta[2] = limit(expected_delta[2], Delta[2], Model_Config.delta_limit, Model_Config.d_delta_limit);
+	Delta[0] = limit(expected_delta(0), Delta[0], Model_Config.delta_limit, Model_Config.d_delta_limit);
+	Delta[1] = limit(expected_delta(1), Delta[1], Model_Config.delta_limit, Model_Config.d_delta_limit);
+	Delta[2] = limit(expected_delta(2), Delta[2], Model_Config.delta_limit, Model_Config.d_delta_limit);
 	
+	/*if (Time > 10) {
+		Delta[0] *= 0.7;
+			Delta[2] = 0.4 * Delta[2];
+		else if (situation == "舵面卡死") {
+			Delta[0] = Delta[0] + Model_Config.BiasFactor / rad;
+			Delta[1] = Delta[1];
+			Delta[2] = Delta[2];
+		}
+		std::cout << v_c.transpose() << endl;
+	}*/
 	//if (situation == "舵面损伤") {
 	if (situation == "") {
 		vector<double> C_FM(6, 0);

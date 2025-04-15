@@ -27,16 +27,17 @@
 
 struct ModelConfig
 {
-	const double T = 50;										// 仿真时间
+	const double T = 30;										// 仿真时间
 	const double step = 0.001;									// 仿真步长
 	const unsigned int iters = (int)(T / step);					// 迭代次数
 	const int tctrl = 5;										// 控制器更新周期 * h
 
-	const double h = 33000.0;									// 高度
+	const double h = 33000.0;									// 高度 - 再入段一般在25km到31km
 	const double v = 4590.0;									// 速度
-	const double alpha = 5.0 / rad;								// 初始攻角
+
+	const double alpha = 0.0 / rad;								// 初始攻角
 	const double beta = 0.0 / rad;								// 初始侧滑角
-	const double mu = -10.0 / rad;								// 初始倾侧角
+	const double mu = 0.0 / rad;								// 初始倾侧角
 
 
 	const double dd_alpha_ref = 0.0 / rad;						// 期望攻角角加速度
@@ -51,10 +52,10 @@ struct ModelConfig
 	const double BiasFactor = 5;								// 舵面恒偏差值
 
 	// 跟踪的姿态角轨迹模式与赋值
-	int trajectoryMode = 1;										// 0:直接跟踪固定值 阶跃响应 1:跟踪斜坡信号
-	const double alpha_ref = 0.0 / rad;							// 期望攻角
+	int trajectoryMode = 0;										// 0:直接跟踪固定值 阶跃响应 1:跟踪斜坡信号
+	const double alpha_ref = 5.0 / rad;							// 期望攻角
 	const double beta_ref = 0.0 / rad;							// 期望侧滑角
-	const double mu_ref = 0.0 / rad;							// 期望倾侧角
+	const double mu_ref = -2.0 / rad;							// 期望倾侧角
 
 
 	std::string vehicle_filename = "../data/" + std::to_string(int(h / 1000)) + "_" + std::to_string(int(DecreaseFactor * 100)) + "_vehicle.txt";
