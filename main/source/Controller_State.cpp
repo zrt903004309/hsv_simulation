@@ -8,16 +8,16 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 {
 	
 	double sat_limit_a = 0.02,sat_limit_b = 0.02,sat_limit_m = 0.02;
-	// ·ÉĞĞÆ÷×´Ì¬(Ö±½Ó¶ÁÈ¡)
+	// é£è¡Œå™¨çŠ¶æ€(ç›´æ¥è¯»å–)
 	double X, Y, Z, V, Gamma, Chi, Alpha, Beta, Mu, p, q, r, Time;
-	// ·ÉĞĞÆ÷²ÎÊı(Ö±½Ó¶ÁÈ¡)
+	// é£è¡Œå™¨å‚æ•°(ç›´æ¥è¯»å–)
 	double Mass, Jx, Jy, Jz, B, C, S, Xcg;
-	// ¸ú×Ù×ËÌ¬(Ö±½Ó¶ÁÈ¡)
+	// è·Ÿè¸ªå§¿æ€(ç›´æ¥è¯»å–)
 	double Alpha_Ref, Beta_Ref, Mu_Ref, dd_Alpha_Ref, dd_Beta_Ref, dd_Mu_Ref;
-	// ³£Á¿»ñÈ¡	
+	// å¸¸é‡è·å–	
 	double rho, g, Ma;
 	
-	// ¿ØÖÆÆ÷²ÎÊı£¬ĞèÒª¼ÆËã
+	// æ§åˆ¶å™¨å‚æ•°ï¼Œéœ€è¦è®¡ç®—
 	double e_Alpha, de_Alpha, e_Beta, de_Beta, e_Mu, de_Mu;
 	double f1, f2, f3, f4, f5, f6;
 
@@ -27,7 +27,7 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	Eigen::Matrix3d E_Back = Eigen::Matrix3d::Zero();
 
 
-	// ¶Á·ÉĞĞÆ÷×´Ì¬
+	// è¯»é£è¡Œå™¨çŠ¶æ€
 	Time = Vehicle_State.Time;
 	V = Vehicle_State.V;
 	Alpha = Vehicle_State.Alpha;
@@ -42,7 +42,7 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	Y = Vehicle_State.Y;
 	Z = Vehicle_State.Z; 
 
-	// ¶Á·ÉĞĞÆ÷²ÎÊı
+	// è¯»é£è¡Œå™¨å‚æ•°
 	Mass = Vehicle_Para.Mass;
 	Jx = Vehicle_Para.Jx;
 	Jy = Vehicle_Para.Jy;
@@ -52,14 +52,14 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	S = Vehicle_Para.S;
 	Xcg = Vehicle_Para.Xcg;
 
-	// ÊäÈë¸ß¶È£¬Êä³öÉùËÙa£¬ÂíºÕÊıMa£¬ÖØÁ¦¼ÓËÙ¶ÈgºÍ´óÆøÃÜ¶Èrho
+	// è¾“å…¥é«˜åº¦ï¼Œè¾“å‡ºå£°é€Ÿaï¼Œé©¬èµ«æ•°Maï¼Œé‡åŠ›åŠ é€Ÿåº¦gå’Œå¤§æ°”å¯†åº¦rho
 	AtmoPara atmo;
 	atmo.GetAtmoPara(-Z);
 	rho = atmo.rho;
 	g = atmo.g;
 	Ma = V / atmo.a;
 
-	// ÆÚÍûµÄ×ËÌ¬½ÇÒÔ¼°ËûÃÇµÄ¶ş½×µ¼²Î¿¼Öµ
+	// æœŸæœ›çš„å§¿æ€è§’ä»¥åŠä»–ä»¬çš„äºŒé˜¶å¯¼å‚è€ƒå€¼
 	Alpha_Ref = Guidance_State.alpha_ref;
 	Beta_Ref = Guidance_State.beta_ref;
 	Mu_Ref = Guidance_State.mu_ref;
@@ -67,12 +67,12 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	dd_Beta_Ref = Guidance_State.dd_beta_ref;
 	dd_Mu_Ref = Guidance_State.dd_mu_ref;
 
-	// µ±Ç°µÄ×ËÌ¬½ÇµÄÆ«²î£¨×ËÌ¬½ÇµÄ*²Î¿¼Öµ* - ×ËÌ¬½ÇµÄ*µ±Ç°Öµ*£©
+	// å½“å‰çš„å§¿æ€è§’çš„åå·®ï¼ˆå§¿æ€è§’çš„*å‚è€ƒå€¼* - å§¿æ€è§’çš„*å½“å‰å€¼*ï¼‰
 	e_Alpha = Alpha_Ref - Alpha;
 	e_Beta = Beta_Ref - Beta;
 	e_Mu = Mu_Ref - Mu;
 
-	// Êä³ö×ËÌ¬½ÇÎó²îµÄÒ»½×µ¼£¨Ò»½×Î¢·Öµü´ú¹«Ê½£© Ôö¼ÓÁËÒ»¸ö ´óµÄÒ»½×ÂË²¨
+	// è¾“å‡ºå§¿æ€è§’è¯¯å·®çš„ä¸€é˜¶å¯¼ï¼ˆä¸€é˜¶å¾®åˆ†è¿­ä»£å…¬å¼ï¼‰ å¢åŠ äº†ä¸€ä¸ª å¤§çš„ä¸€é˜¶æ»¤æ³¢
 	/*de_Alpha = (e_Alpha - e_Alpha_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Alpha_Pre * 0.9851;
 	de_Beta = (e_Beta - e_Beta_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Beta_Pre * 0.9851;
 	de_Mu = (e_Mu - e_Mu_Pre) / (Model_Config.step * Model_Config.tctrl) + de_Mu_Pre * 0.9851;*/
@@ -80,14 +80,14 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	de_Beta = (e_Beta - e_Beta_Pre) / (Model_Config.step * Model_Config.tctrl);
 	de_Mu = (e_Mu - e_Mu_Pre) / (Model_Config.step * Model_Config.tctrl);
 
-	// Êä³ö×ËÌ¬½ÇÎó²îµÄÒ»½×µ¼£¨Ò»½×Î¢·Öµü´ú¹«Ê½£© Ôö¼ÓÁËÒ»¸ö ´óµÄÒ»½×ÂË²¨
+	// è¾“å‡ºå§¿æ€è§’è¯¯å·®çš„ä¸€é˜¶å¯¼ï¼ˆä¸€é˜¶å¾®åˆ†è¿­ä»£å…¬å¼ï¼‰ å¢åŠ äº†ä¸€ä¸ª å¤§çš„ä¸€é˜¶æ»¤æ³¢
 	i_e_Alpha += e_Alpha * (Model_Config.step * Model_Config.tctrl);
 	i_e_Beta += e_Beta * (Model_Config.step * Model_Config.tctrl);
 	i_e_Mu += e_Mu * (Model_Config.step * Model_Config.tctrl);
 	
-	//printf("ÈıÖáÎó²î:%f %f %f ÈıÖáÎó²îµÄÎ¢·Ö:%f %f %f ÈıÖáÎó²îµÄ»ı·Ö:%f %f %f\n", e_Alpha, e_Beta, e_Mu, de_Alpha, de_Beta, de_Mu, i_e_Alpha, i_e_Beta, i_e_Mu);
+	//printf("ä¸‰è½´è¯¯å·®:%f %f %f ä¸‰è½´è¯¯å·®çš„å¾®åˆ†:%f %f %f ä¸‰è½´è¯¯å·®çš„ç§¯åˆ†:%f %f %f\n", e_Alpha, e_Beta, e_Mu, de_Alpha, de_Beta, de_Mu, i_e_Alpha, i_e_Beta, i_e_Mu);
 
-	// ¼ÆËã×´Ì¬¿Õ¼ä·½³ÌÖĞµÄf(x)
+	// è®¡ç®—çŠ¶æ€ç©ºé—´æ–¹ç¨‹ä¸­çš„f(x)
 	f1 = (Jy - Jz) * q * r / Jx;
 	f2 = (Jz - Jx) * p * r / Jy;
 	f3 = (Jx - Jy) * p * q / Jz;
@@ -95,12 +95,12 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	f5 = p * sin(Alpha) - r * cos(Alpha);
 	f6 = (p * cos(Alpha) + r * sin(Alpha)) / cos(Beta);
 
-	// ¶ÔÓ¦¶ş½×µ¼ÊıÖĞµÄF
+	// å¯¹åº”äºŒé˜¶å¯¼æ•°ä¸­çš„F
 	F_Back(0) = -f1 * cos(Alpha) * tan(Beta) + f2 - f3 * sin(Alpha) * tan(Beta) + f4 * (p * sin(Alpha) * tan(Beta) - r * cos(Alpha) * tan(Beta)) - f5 * (p * cos(Alpha) + r * sin(Alpha)) / (cos(Beta) * cos(Beta));
 	F_Back(1) = f1 * sin(Alpha) - f3 * cos(Alpha) + f4 * (p * cos(Alpha) + r * sin(Alpha));
 	F_Back(2) = f1 * cos(Alpha) / cos(Beta) + f3 * sin(Alpha) / cos(Beta) + f4 * (-p * sin(Alpha) / cos(Beta) + r * cos(Alpha) / cos(Beta)) + f5 * (p * cos(Alpha) * tan(Beta) / cos(Beta) + r * sin(Alpha) * tan(Beta) / cos(Beta));
 
-	// ¶ÔÓ¦¶ş½×µ¼ÊıÖĞµÄE
+	// å¯¹åº”äºŒé˜¶å¯¼æ•°ä¸­çš„E
 	E_Back(0, 0) = -cos(Alpha) * tan(Beta) / Jx;
 	E_Back(0, 1) = sin(Alpha) / Jx;
 	E_Back(0, 2) = (cos(Alpha) / cos(Beta)) / Jx;
@@ -112,8 +112,8 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	E_Back(2, 2) = (sin(Alpha) / cos(Beta)) / Jz;
 
 	
-	if (controlMode == "¿ìËÙ»¬Ä£") {
-		// 1. ¿ìËÙ¹â»¬¶ş½×»¬Ä£
+	if (controlMode == "å¿«é€Ÿæ»‘æ¨¡") {
+		// 1. å¿«é€Ÿå…‰æ»‘äºŒé˜¶æ»‘æ¨¡
 		double A_k1 = 0.5, A_k2 = 0.2, A_k3 = 0.1, A_k4 = 0.01, A_k5 = 0.01, A_k6 = 0.01, A_eta = 0.001;
 		double B_k1 = 0.5, B_k2 = 0.2, B_k3 = 0.1, B_k4 = 0.01, B_k5 = 0.01, B_k6 = 0.01, B_eta = 0.001;
 		double M_k1 = 0.5, M_k2 = 0.2, M_k3 = 0.1, M_k4 = 0.01, M_k5 = 0.01, M_k6 = 0.01, M_eta = 0.001;
@@ -138,8 +138,8 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		v_c[1] = dd_Beta_Ref - B_k1 * de_Beta - B_k2 * e_Beta - B_k3 * pow(fabs(s_Beta), (p1 - 1) / p1) * sat_s(s_Beta, sat_limit_b) - B_k4 * s_Beta - i_s5_Beta - i_s6_Beta - B_eta * sat_s(s_Beta, sat_limit_b);
 		v_c[2] = dd_Mu_Ref - M_k1 * de_Mu - M_k2 * e_Mu - M_k3 * pow(fabs(s_Mu), (p1 - 1) / p1) * sat_s(s_Mu, sat_limit_m) - M_k4 * s_Mu - i_s5_Mu - i_s6_Mu - M_eta * sat_s(s_Mu, sat_limit_m);
 	}	
-	else if (controlMode == "×ÔÊÊÓ¦»¬Ä£") {
-		// 2. ×ÔÊÊÓ¦ÖÕ¶Ë»¬Ä£
+	else if (controlMode == "è‡ªé€‚åº”æ»‘æ¨¡") {
+		// 2. è‡ªé€‚åº”ç»ˆç«¯æ»‘æ¨¡
 		double A_k1 = 0.01, A_k2 = 0.01, A_k3 = 0.005, A_k4 = 0.005, A_k5 = 0.1;
 		double B_k1 = 0.01, B_k2 = 0.01, B_k3 = 0.005, B_k4 = 0.005, B_k5 = 0.1;
 		double M_k1 = 0.01, M_k2 = 0.01, M_k3 = 0.005, M_k4 = 0.005, M_k5 = 0.1;
@@ -161,7 +161,7 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		v_c(1) = dd_Beta_Ref - B_k1 * de_Beta - B_k2 * pow(fabs(de_Beta), a1) * sat_s(de_Beta, sat_limit_b) - B_k3 * pow(fabs(de_Beta), a2) * sat_s(de_Beta, sat_limit_b) - B_k4 * s_Beta - B_k5 * pow(fabs(s_Beta), p1) * sat_s(s_Beta, sat_limit_b) - epson * s_Beta;
 		v_c(2) = dd_Mu_Ref - M_k1 * de_Mu - M_k2 * pow(fabs(de_Mu), a1) * sat_s(de_Mu, sat_limit_m) - M_k3 * pow(fabs(de_Mu), a2) * sat_s(de_Mu, sat_limit_m) - M_k4 * s_Mu - M_k5 * pow(fabs(s_Mu), p1) * sat_s(s_Mu, sat_limit_m) - epson * s_Mu;
 	}	
-	else if (controlMode == "È«¾Öpid»¬Ä£"){
+	else if (controlMode == "å…¨å±€pidæ»‘æ¨¡"){
 		double A_k = 3.15, B_k = 3.15, M_k = 3.15;
 		double A_kL = 5.0625, B_kL = 5.0625, M_kL = 5.0625;
 		double A_eta = 0.2, B_eta = 0.05, M_eta = 1;
@@ -171,13 +171,13 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		//s_Beta_0 = s_Beta_0;
 		//s_Mu_0 = s_Mu_0;
 		//if (Time <= 0.001)
-		//{  //¶¨Òås0=0
+		//{  //å®šä¹‰s0=0
 		//	s_Alpha_0 = -(de_Alpha + A_k * e_Alpha);
 		//	s_Beta_0 = -(de_Beta + B_k * e_Beta);
 		//	s_Mu_0 = -(de_Mu + M_k * e_Mu);
 		//}
 
-		////¹¹ÔìÊ±±ä»¬Ä£º¯Êı
+		////æ„é€ æ—¶å˜æ»‘æ¨¡å‡½æ•°
 		//s_Alpha = A_k * e_Alpha + de_Alpha + A_kL * i_e_Alpha  + s_Alpha_0 * exp(-A_lambda * Time);
 		//s_Beta = B_k * e_Beta + de_Beta + B_kL * i_e_Beta + s_Beta_0 * exp(-B_lambda * Time);
 		//s_Mu = M_k * e_Mu + de_Mu + M_kL * i_e_Mu + s_Mu_0 * exp(-M_lambda * Time);
@@ -186,34 +186,34 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		s_Beta = B_k * e_Beta + de_Beta + B_kL * i_e_Beta;
 		s_Mu = M_k * e_Mu + de_Mu + M_kL * i_e_Mu;
 
-		//¼ÆËã¸¨Öú¿ØÖÆÂÊ
+		//è®¡ç®—è¾…åŠ©æ§åˆ¶ç‡
 		v_c[0] = A_kL * e_Alpha + A_k * de_Alpha + A_eta * sat_s(s_Alpha, sat_limit_a) + dd_Alpha_Ref;
 		v_c[1] = B_kL * e_Beta + B_k * de_Beta + B_eta * sat_s(s_Beta, sat_limit_b) + dd_Beta_Ref;
 		v_c[2] = M_kL * e_Mu + M_k * de_Mu + M_eta * sat_s(s_Mu, sat_limit_m) + dd_Mu_Ref;
 	}
 	
-	// ¼ÆËãĞĞÁĞÊ½
+	// è®¡ç®—è¡Œåˆ—å¼
 	double determinant = E_Back.determinant();
 
-	Eigen::Matrix3d E_Inv = E_Back.inverse();					// ¼ÆËãEÄæ
-	M_control = E_Inv.transpose() * (v_c - F_Back);				// ¼ÆËãEÄæ *£¨v-F£©µÃµ½¿ØÖÆÁ¦¾Ø
+	Eigen::Matrix3d E_Inv = E_Back.inverse();					// è®¡ç®—Eé€†
+	M_control = E_Inv.transpose() * (v_c - F_Back);				// è®¡ç®—Eé€† *ï¼ˆv-Fï¼‰å¾—åˆ°æ§åˆ¶åŠ›çŸ©
 	
-	/************************************************** ¿ØÖÆ·ÖÅä **************************************************************/
-	// ¶æÆ«¼ÆËã    Ö´ĞĞ»ú¹¹Ö¸ÁîÏŞ·ù
-	double q_dyn = 0.5 * V * V * rho;			// ¼ÆËã¶¯Ñ¹
+	/************************************************** æ§åˆ¶åˆ†é… **************************************************************/
+	// èˆµåè®¡ç®—    æ‰§è¡Œæœºæ„æŒ‡ä»¤é™å¹…
+	double q_dyn = 0.5 * V * V * rho;			// è®¡ç®—åŠ¨å‹
 	vector<vector<double>> CoefficientDerivative(6, vector<double>(7, 0));
 	getCoefficientsDerivative(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, CoefficientDerivative);
 
-	// ÆÚÍûµÄÓÉ¶æ²úÉúµÄÁ¦¾Ø
+	// æœŸæœ›çš„ç”±èˆµäº§ç”Ÿçš„åŠ›çŸ©
 	Eigen::Vector3d temp = Eigen::Vector3d::Zero();
 	temp(0) = M_control(0) - q_dyn * B * S * CoefficientDerivative[3][6];
 	temp(1) = M_control(1) - q_dyn * S * (C * CoefficientDerivative[4][5] + Xcg * (CoefficientDerivative[0][0] * sin(Alpha) + CoefficientDerivative[2][0] * cos(Alpha)));
 	temp(2) = M_control(2) - q_dyn * S * (B * CoefficientDerivative[5][6] - Xcg * CoefficientDerivative[1][0] * Beta);
 
-	printf("ÆÚÍûĞéÄâ¿ØÖÆ:%f %f %f \n", v_c(0), v_c(1), v_c(2));
-	printf("ÆÚÍû¿ØÖÆÁ¦¾Ø:%f %f %f ÆÚÍû¶æ²úÉúµÄÁ¦¾Ø:%f %f %f \n", M_control(0), M_control(1), M_control(2), temp(0), temp(1), temp(2));
+	printf("æœŸæœ›è™šæ‹Ÿæ§åˆ¶:%f %f %f \n", v_c(0), v_c(1), v_c(2));
+	printf("æœŸæœ›æ§åˆ¶åŠ›çŸ©:%f %f %f æœŸæœ›èˆµäº§ç”Ÿçš„åŠ›çŸ©:%f %f %f \n", M_control(0), M_control(1), M_control(2), temp(0), temp(1), temp(2));
 
-	// ¿ØÖÆĞ§ÂÊ¾ØÕó(¶ÔÃ¿¸ö¶æµÄµ¼Êı)  ĞèÒªĞŞ¸ÄrÄÇÒ»Ïî
+	// æ§åˆ¶æ•ˆç‡çŸ©é˜µ(å¯¹æ¯ä¸ªèˆµçš„å¯¼æ•°)  éœ€è¦ä¿®æ”¹ré‚£ä¸€é¡¹
 	Eigen::Matrix3d gDelta = Eigen::Matrix3d::Zero();
 	gDelta(0, 0) = q_dyn * B * S * CoefficientDerivative[3][1];
 	gDelta(0, 1) = q_dyn * S * (C * CoefficientDerivative[4][1] + Xcg * (CoefficientDerivative[0][1] * sin(Alpha) + CoefficientDerivative[2][1] * cos(Alpha)));
@@ -228,13 +228,13 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	Eigen::Matrix3d g_Inv = gDelta.inverse();
 
 	Eigen::Vector3d expected_delta = g_Inv.transpose() * temp;
-	printf("ÆÚÍû¶æ½Ç:%f %f %f \n", expected_delta(0), expected_delta(1), expected_delta(2));
+	printf("æœŸæœ›èˆµè§’:%f %f %f \n", expected_delta(0), expected_delta(1), expected_delta(2));
 
 	/*if (Vehicle_State.Time > 20) {
 		expected_delta[0] *= 0.9;
 	}*/
 
-	// ·ùÖµºÍËÙ¶ÈÏŞÖÆ
+	// å¹…å€¼å’Œé€Ÿåº¦é™åˆ¶
 	Delta[0] = limit(expected_delta(0), Delta[0], Model_Config.delta_limit, Model_Config.d_delta_limit);
 	Delta[1] = limit(expected_delta(1), Delta[1], Model_Config.delta_limit, Model_Config.d_delta_limit);
 	Delta[2] = limit(expected_delta(2), Delta[2], Model_Config.delta_limit, Model_Config.d_delta_limit);
@@ -242,14 +242,14 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	/*if (Time > 10) {
 		Delta[0] *= 0.7;
 			Delta[2] = 0.4 * Delta[2];
-		else if (situation == "¶æÃæ¿¨ËÀ") {
+		else if (situation == "èˆµé¢å¡æ­»") {
 			Delta[0] = Delta[0] + Model_Config.BiasFactor / rad;
 			Delta[1] = Delta[1];
 			Delta[2] = Delta[2];
 		}
 		std::cout << v_c.transpose() << endl;
 	}*/
-	//if (situation == "¶æÃæËğÉË") {
+	//if (situation == "èˆµé¢æŸä¼¤") {
 	if (situation == "") {
 		vector<double> C_FM(6, 0);
 		getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
@@ -263,7 +263,7 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 		M_c[2] = M_control(2);
 	}
 	
-	// ±£´æ¿ØÖÆÆ÷²ÎÊıÖĞµÄ¹ıÈ¥Öµ
+	// ä¿å­˜æ§åˆ¶å™¨å‚æ•°ä¸­çš„è¿‡å»å€¼
 	e_Alpha_Pre=e_Alpha;
 	de_Alpha_Pre=de_Alpha;
 	e_Beta_Pre=e_Beta;
@@ -272,32 +272,32 @@ void ControllerState::Controller_State_Update(const VehicleState& Vehicle_State,
 	de_Mu_Pre=de_Mu;
 }
 
-ControllerState::ControllerState()  //¿ØÖÆÆ÷×´Ì¬³õÊ¼»¯
+ControllerState::ControllerState()  //æ§åˆ¶å™¨çŠ¶æ€åˆå§‹åŒ–
 {
 
-	e_Alpha_Pre = 0.0;						// ¹¥½ÇµÄÆ«²î£¨²Î¿¼Öµ-Êµ¼ÊÖµ£©
-	de_Alpha_Pre = 0.0;						// ¹¥½ÇµÄÆ«²îµÄµ¼Êı
+	e_Alpha_Pre = 0.0;						// æ”»è§’çš„åå·®ï¼ˆå‚è€ƒå€¼-å®é™…å€¼ï¼‰
+	de_Alpha_Pre = 0.0;						// æ”»è§’çš„åå·®çš„å¯¼æ•°
 
-	e_Beta_Pre = 0.0;						// ²à»¬½ÇµÄÆ«²î£¨²Î¿¼Öµ-Êµ¼ÊÖµ£©
-	de_Beta_Pre = 0.0;						// ²à»¬½ÇµÄÆ«²îµÄµ¼Êı
+	e_Beta_Pre = 0.0;						// ä¾§æ»‘è§’çš„åå·®ï¼ˆå‚è€ƒå€¼-å®é™…å€¼ï¼‰
+	de_Beta_Pre = 0.0;						// ä¾§æ»‘è§’çš„åå·®çš„å¯¼æ•°
 
-	e_Mu_Pre = 0.0;							// Çã²à½ÇµÄÆ«²î£¨²Î¿¼Öµ-Êµ¼ÊÖµ£©
-	de_Mu_Pre = 0.0;						// Çã²à½ÇµÄÆ«²îµÄµ¼Êı
+	e_Mu_Pre = 0.0;							// å€¾ä¾§è§’çš„åå·®ï¼ˆå‚è€ƒå€¼-å®é™…å€¼ï¼‰
+	de_Mu_Pre = 0.0;						// å€¾ä¾§è§’çš„åå·®çš„å¯¼æ•°
 
-	s_Alpha = 0.0;							// ¹¥½ÇµÄ»¬Ä¤º¯Êı
-	s_Beta = 0.0;							// ²à»¬½ÇµÄ»¬Ä¤º¯Êı
-	s_Mu = 0.0;								// Çã²à½ÇµÄ»¬Ä¤º¯Êı
+	s_Alpha = 0.0;							// æ”»è§’çš„æ»‘è†œå‡½æ•°
+	s_Beta = 0.0;							// ä¾§æ»‘è§’çš„æ»‘è†œå‡½æ•°
+	s_Mu = 0.0;								// å€¾ä¾§è§’çš„æ»‘è†œå‡½æ•°
 
-	s_Alpha_0 = 0.0;						// ¹¥½ÇµÄ»¬Ä¤º¯Êı³õÖµ
-	s_Beta_0 = 0.0;							// ²à»¬½ÇµÄ»¬Ä¤º¯Êı³õÖµ
-	s_Mu_0 = 0.0;							// Çã²à½ÇµÄ»¬Ä¤º¯Êı³õÖµ
+	s_Alpha_0 = 0.0;						// æ”»è§’çš„æ»‘è†œå‡½æ•°åˆå€¼
+	s_Beta_0 = 0.0;							// ä¾§æ»‘è§’çš„æ»‘è†œå‡½æ•°åˆå€¼
+	s_Mu_0 = 0.0;							// å€¾ä¾§è§’çš„æ»‘è†œå‡½æ•°åˆå€¼
 
-	M_c = std::vector<double>(3, 0.0);		// ¿ØÖÆÁ¦¾Ø
-	Delta = std::vector<double>(3, 0.0);	// ¶æÃæ½Ç¶È
+	M_c = std::vector<double>(3, 0.0);		// æ§åˆ¶åŠ›çŸ©
+	Delta = std::vector<double>(3, 0.0);	// èˆµé¢è§’åº¦
 
-	i_e_Alpha = 0.0;						// ¹¥½ÇÎó²îµÄ»ı·Ö£¨»ı·ÖÊ±¼äÎª¿ØÖÆÖÜÆÚ£©
-	i_e_Beta = 0.0;							// ²à»¬½ÇÎó²îµÄ»ı·Ö£¨»ı·ÖÊ±¼äÎª¿ØÖÆÖÜÆÚ£©
-	i_e_Mu = 0.0;							// Çã²à½ÇÎó²îµÄ»ı·Ö£¨»ı·ÖÊ±¼äÎª¿ØÖÆÖÜÆÚ£©
+	i_e_Alpha = 0.0;						// æ”»è§’è¯¯å·®çš„ç§¯åˆ†ï¼ˆç§¯åˆ†æ—¶é—´ä¸ºæ§åˆ¶å‘¨æœŸï¼‰
+	i_e_Beta = 0.0;							// ä¾§æ»‘è§’è¯¯å·®çš„ç§¯åˆ†ï¼ˆç§¯åˆ†æ—¶é—´ä¸ºæ§åˆ¶å‘¨æœŸï¼‰
+	i_e_Mu = 0.0;							// å€¾ä¾§è§’è¯¯å·®çš„ç§¯åˆ†ï¼ˆç§¯åˆ†æ—¶é—´ä¸ºæ§åˆ¶å‘¨æœŸï¼‰
 
 	i_s5_Alpha = 0.0;
 	i_s5_Beta = 0.0;
@@ -315,7 +315,7 @@ ControllerState::ControllerState()  //¿ØÖÆÆ÷×´Ì¬³õÊ¼»¯
 
 }
 
-int sgn_s(double s) //·ûºÅº¯Êı
+int sgn_s(double s) //ç¬¦å·å‡½æ•°
 {
 	if(s > 0)
 		return 1;
@@ -325,7 +325,7 @@ int sgn_s(double s) //·ûºÅº¯Êı
 		return 0;
 }
 
-double sat_s(double s, double k_sat)  //±¥ºÍº¯Êı
+double sat_s(double s, double k_sat)  //é¥±å’Œå‡½æ•°
 {
 	double d;
 	d = s / k_sat;
@@ -338,9 +338,9 @@ double sat_s(double s, double k_sat)  //±¥ºÍº¯Êı
 }
 
 double limit(const double& x, const double& x_pre, const double& amplitude_limit, const double& velocity_limit) {
-	double velocity = (x - x_pre);		// Ò»¸öÊ±¼ä²½µÄ±ä»¯Á¿
+	double velocity = (x - x_pre);		// ä¸€ä¸ªæ—¶é—´æ­¥çš„å˜åŒ–é‡
 	if (velocity >= -velocity_limit && velocity <= velocity_limit) {
-		// ¼ì²éËÙ¶ÈÏŞÖÆ£¬·ûºÏ
+		// æ£€æŸ¥é€Ÿåº¦é™åˆ¶ï¼Œç¬¦åˆ
 		if (-amplitude_limit <= x && x <= amplitude_limit) {
 			return x;
 		}
@@ -350,9 +350,9 @@ double limit(const double& x, const double& x_pre, const double& amplitude_limit
 		else return amplitude_limit;
 	}
 	else if (velocity < -velocity_limit) {
-		// µ÷Õû x ÒÔÂú×ãËÙ¶ÈÏÂÏŞ
+		// è°ƒæ•´ x ä»¥æ»¡è¶³é€Ÿåº¦ä¸‹é™
 		double new_x = x_pre - velocity_limit;
-		// ÔÙ¼ì²é·ùÖµÏŞÖÆ
+		// å†æ£€æŸ¥å¹…å€¼é™åˆ¶
 		if (-amplitude_limit <= new_x && new_x <= amplitude_limit) {
 			return new_x;
 		}
@@ -362,9 +362,9 @@ double limit(const double& x, const double& x_pre, const double& amplitude_limit
 		else return amplitude_limit;
 	}
 	else {
-		// µ÷Õû x ÒÔÂú×ãËÙ¶ÈÉÏÏŞ
+		// è°ƒæ•´ x ä»¥æ»¡è¶³é€Ÿåº¦ä¸Šé™
 		double new_x = x_pre + velocity_limit;
-		// ÔÙ¼ì²é·ùÖµÏŞÖÆ
+		// å†æ£€æŸ¥å¹…å€¼é™åˆ¶
 		if (-amplitude_limit <= new_x && new_x <= amplitude_limit) {
 			return new_x;
 		}
