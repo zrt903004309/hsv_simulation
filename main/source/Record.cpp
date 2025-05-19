@@ -104,6 +104,4 @@ void Record(const VehicleState& Vehicle_State, const ControllerState& Controller
 		fprintf(File_Control, "%.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f %.10f\n",
 			Delta[0], Delta[1], Delta[2], s_Alpha, s_Beta, s_Mu, M[0], M[1], M[2], Mc_e[0], Mc_e[1], Mc_e[2], Mc[0], Mc[1], Mc[2], u[0], u[1], u[2], A_K, B_K, M_K, A_eta, B_eta, M_eta);
 	}
-
-	
 }

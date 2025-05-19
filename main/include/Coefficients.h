@@ -12,3 +12,4 @@ void getCoefficientsDetails(const double& Mach, const double& Alpha, const doubl
 void loadAeroCoefficients(const double& Mach_step, const double& Alpha_step);
 
 #endif
+

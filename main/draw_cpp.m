@@ -26,7 +26,7 @@ p = data2(:, 15);       q = data2(:, 16);       r = data2(:, 17);
 
 % index = find(abs(Alpha - 3) >= 0.05 * abs(3 - Alpha(1)), 1, 'last');
 % settling_time = T(index);
-% disp(['µ÷½ÚÊ±¼äÎª£º', num2str(settling_time), ' Ãë']);
+% disp(['è°ƒèŠ‚æ—¶é—´ä¸ºï¼š', num2str(settling_time), ' ç§’']);
 
 % figure;
 % plot(T, A_K, 'r',T, B_K, 'b',T, M_K, 'm', 'LineWidth', 1.5);
@@ -46,25 +46,25 @@ p = data2(:, 15);       q = data2(:, 16);       r = data2(:, 17);
 % ylabel('g_{13}');
 % xlabel('t/s');
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter4\G1±ä»¯ÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter4\G1å˜åŒ–æ›²çº¿');
 
-% fig1 - ÈıÍ¨µÀ×ËÌ¬½ÇÓë²Î¿¼×ËÌ¬½Ç
+% fig1 - ä¸‰é€šé“å§¿æ€è§’ä¸å‚è€ƒå§¿æ€è§’
 figure;
-% set(gca,'FontSize',20); %ÉèÖÃ×ø±êÖá×ÖÌå´óĞ¡Îª8
-% set(legend,'FontSize',8);   %ÉèÖÃlegendµÄ×ÖÌå´óĞ¡Îª8
+% set(gca,'FontSize',20); %è®¾ç½®åæ ‡è½´å­—ä½“å¤§å°ä¸º8
+% set(legend,'FontSize',8);   %è®¾ç½®legendçš„å­—ä½“å¤§å°ä¸º8
 subplot(3, 1, 1);
 plot(T, Alpha, 'r', T, Alpha_ref, 'b--', 'LineWidth', 1.5);
 ylim([-3,12]);
-ylabel('\alpha(¡ã)');
-legend('Êä³ö×ËÌ¬½Ç', 'ÆÚÍû×ËÌ¬½Ç','Location','southeast');
+ylabel('\alpha(Â°)');
+legend('è¾“å‡ºå§¿æ€è§’', 'æœŸæœ›å§¿æ€è§’','Location','southeast');
 subplot(3, 1, 2);
 plot(T, Beta, 'r', T, Beta_ref, 'b--',  'LineWidth', 1.5);
-ylabel('\beta(¡ã)');
-legend('Êä³ö×ËÌ¬½Ç', 'ÆÚÍû×ËÌ¬½Ç');
+ylabel('\beta(Â°)');
+legend('è¾“å‡ºå§¿æ€è§’', 'æœŸæœ›å§¿æ€è§’');
 subplot(3, 1, 3);
 plot(T, Mu, 'r', T, Mu_ref, 'b--',  'LineWidth', 1.5);
-ylabel('\mu(¡ã)');
-legend('Êä³ö×ËÌ¬½Ç', 'ÆÚÍû×ËÌ¬½Ç');
+ylabel('\mu(Â°)');
+legend('è¾“å‡ºå§¿æ€è§’', 'æœŸæœ›å§¿æ€è§’');
 xlabel('t/s');
 
 if num == 2
@@ -82,15 +82,15 @@ if num == 2
 end
 
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\¹ÊÕÏ×ËÌ¬½Ç¸ú×ÙÏìÓ¦ÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\æ•…éšœå§¿æ€è§’è·Ÿè¸ªå“åº”æ›²çº¿');
 
-% fig2 - ÈıÍ¨µÀ»¬Ä£º¯Êı
+% fig2 - ä¸‰é€šé“æ»‘æ¨¡å‡½æ•°
 figure;
 subplot(3, 1, 1);
 plot(T, s_Alpha, 'r', 'LineWidth', 1.5);
 ylim([-0.05,0.05]);
 ylabel('s(\alpha)');
-% legend('×ËÌ¬½Ç»¬Ä£º¯Êı');
+% legend('å§¿æ€è§’æ»‘æ¨¡å‡½æ•°');
 subplot(3, 1, 2);
 plot(T, s_Beta, 'r',  'LineWidth', 1.5);
 ylim([-0.05,0.05]);
@@ -113,20 +113,20 @@ axis
 % plot(T, s_Mu, 'r',  'LineWidth', 1.5);
 % xlim([14,17]);
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\¹ÊÕÏ»¬Ä£º¯ÊıÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\æ•…éšœæ»‘æ¨¡å‡½æ•°æ›²çº¿');
 
-% fig3 - Èı¸ö¶æÆ«½Ç
+% fig3 - ä¸‰ä¸ªèˆµåè§’
 figure;
 subplot(3, 1, 1);
 plot(T, Delta_e, 'r', 'LineWidth', 1.5);
-ylabel('\delta_e(¡ã)');
-% legend('¶æÃæÆ«½Ç');
+ylabel('\delta_e(Â°)');
+% legend('èˆµé¢åè§’');
 subplot(3, 1, 2);
 plot(T, Delta_a, 'r',  'LineWidth', 1.5);
-ylabel('\delta_a(¡ã)');
+ylabel('\delta_a(Â°)');
 subplot(3, 1, 3);
 plot(T, Delta_r, 'r',  'LineWidth', 1.5);
-ylabel('\delta_r(¡ã)');
+ylabel('\delta_r(Â°)');
 xlabel('t/s');
 
 axes('position',[0.45 0.84 0.15 0.09]);
@@ -142,63 +142,63 @@ plot(T, Delta_r, 'r',  'LineWidth', 1.5);
 xlim([14,17]);
 
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\¹ÊÕÏ¶æÆ«½ÇÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\æ•…éšœèˆµåè§’æ›²çº¿');
 
-% fig4 -ÆÚÍûÊµ¼ÊÁ¦¾ØÇúÏß
+% fig4 -æœŸæœ›å®é™…åŠ›çŸ©æ›²çº¿
 figure;
 subplot(3, 1, 1);
 plot(T, M_x, 'r', 'LineWidth', 1.5);
-ylabel('M_x(N¡¤m)');
-legend('ÆÚÍûÊµ¼ÊÁ¦¾Ø');
+ylabel('M_x(NÂ·m)');
+legend('æœŸæœ›å®é™…åŠ›çŸ©');
 subplot(3, 1, 2);
 plot(T, M_y, 'r',  'LineWidth', 1.5);
-ylabel('M_y(N¡¤m)');
+ylabel('M_y(NÂ·m)');
 subplot(3, 1, 3);
 plot(T, M_z, 'r',  'LineWidth', 1.5);
-ylabel('M_z(N¡¤m)');
+ylabel('M_z(NÂ·m)');
 xlabel('t/s');
 
-% fig5 - ¿ØÖÆÁ¦¾ØÇúÏß
+% fig5 - æ§åˆ¶åŠ›çŸ©æ›²çº¿
 figure;
 subplot(3, 1, 1);
 plot(T, Mc_xe, 'r', T, Mc_x, 'b--', 'LineWidth', 1.5);
-ylabel('Mc_x(N¡¤m)');
-legend('ÆÚÍû¿ØÖÆÁ¦¾Ø', 'Êµ¼Ê¿ØÖÆÁ¦¾Ø');
+ylabel('Mc_x(NÂ·m)');
+legend('æœŸæœ›æ§åˆ¶åŠ›çŸ©', 'å®é™…æ§åˆ¶åŠ›çŸ©');
 subplot(3, 1, 2);
 plot(T, Mc_ye, 'm', T, Mc_y, 'b--', 'LineWidth', 1.5);
-legend('ÆÚÍû¿ØÖÆÁ¦¾Ø', 'Êµ¼Ê¿ØÖÆÁ¦¾Ø');
-ylabel('Mc_y(N¡¤m)');
+legend('æœŸæœ›æ§åˆ¶åŠ›çŸ©', 'å®é™…æ§åˆ¶åŠ›çŸ©');
+ylabel('Mc_y(NÂ·m)');
 subplot(3, 1, 3);
 plot(T, Mc_ze, 'r', T, Mc_z, 'b--',  'LineWidth', 1.5);
-legend('ÆÚÍû¿ØÖÆÁ¦¾Ø', 'Êµ¼Ê¿ØÖÆÁ¦¾Ø');
-ylabel('Mc_z(N¡¤m)');
+legend('æœŸæœ›æ§åˆ¶åŠ›çŸ©', 'å®é™…æ§åˆ¶åŠ›çŸ©');
+ylabel('Mc_z(NÂ·m)');
 xlabel('t/s');
 
 
-% fig6 - ËÙ¶È±ä»¯ÇúÏß
+% fig6 - é€Ÿåº¦å˜åŒ–æ›²çº¿
 figure;
 plot(T,V,'r--');
 legend('V');
 
-% fig7 - ÈıÖáÎ»ÖÃ±ä»¯ÇúÏß
+% fig7 - ä¸‰è½´ä½ç½®å˜åŒ–æ›²çº¿
 figure;
 plot3(X, Y, -Z, 'b-', 'LineWidth', 0.8, 'MarkerSize', 8);
 
-% ÉèÖÃ×ø±êÖá±êÇ©ºÍ±êÌâ
+% è®¾ç½®åæ ‡è½´æ ‡ç­¾å’Œæ ‡é¢˜
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('ÈıÎ¬ÇúÏßÍ¼');
+title('ä¸‰ç»´æ›²çº¿å›¾');
 
-% ÏÔÊ¾Íø¸ñÏß
+% æ˜¾ç¤ºç½‘æ ¼çº¿
 grid on;
 
-% fig8 - p q rÇúÏß
+% fig8 - p q ræ›²çº¿
 figure;
 subplot(3, 1, 1);
 plot(T, p, 'r', 'LineWidth', 1.5);
 ylabel('p(rad/s)');
-% legend('½Ç¼ÓËÙ¶È');
+% legend('è§’åŠ é€Ÿåº¦');
 subplot(3, 1, 2);
 plot(T, q, 'r',  'LineWidth', 1.5);
 ylabel('q(rad/s)');
@@ -207,32 +207,32 @@ plot(T, r, 'r',  'LineWidth', 1.5);
 ylabel('r(rad/s)');
 xlabel('t/s');
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\¹ÊÕÏ×ËÌ¬½ÇËÙ¶È±ä»¯ÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\æ•…éšœå§¿æ€è§’é€Ÿåº¦å˜åŒ–æ›²çº¿');
 
-% fig9 - º½¼£½Ç
+% fig9 - èˆªè¿¹è§’
 figure;
 plot(T,Gamma,'r-',T,Chi,'m-');
 legend('Gamma','Chi');grid on;
 
-% fig10 - ÈıÍ¨µÀ×ËÌ¬½ÇÎó²îÇúÏß
+% fig10 - ä¸‰é€šé“å§¿æ€è§’è¯¯å·®æ›²çº¿
 figure;
 plot(T, Alpha-Alpha_ref, 'r',T, Beta-Beta_ref, 'b',T, Mu-Mu_ref, 'm', 'LineWidth', 1.5);
 xlabel('t/s');
-ylabel('×ËÌ¬½ÇÎó²î(¡ã)');
+ylabel('å§¿æ€è§’è¯¯å·®(Â°)');
 legend('e_\alpha', 'e_\beta', 'e_\mu');
 axes('position',[0.4 0.65 0.25 0.25]);
 plot(T, Alpha-Alpha_ref, 'r', T, Beta-Beta_ref, 'b--', T, Mu-Mu_ref, 'm', 'LineWidth', 1.5);
 xlim([12.5,17.5]);
 
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\¹ÊÕÏ×ËÌ¬½ÇÎó²î');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\æ•…éšœå§¿æ€è§’è¯¯å·®');
 
-% fig11 - ĞéÄâ¿ØÖÆÁ¿ÇúÏß
+% fig11 - è™šæ‹Ÿæ§åˆ¶é‡æ›²çº¿
 % figure;
 % subplot(3, 1, 1);
 % plot(T, u1, 'r', 'LineWidth', 1.5);
 % ylabel('u1');
-% legend('ÆÚÍûÊµ¼ÊÁ¦¾Ø');
+% legend('æœŸæœ›å®é™…åŠ›çŸ©');
 % subplot(3, 1, 2);
 % plot(T, u2, 'r',  'LineWidth', 1.5);
 % ylabel('u2');
@@ -246,7 +246,7 @@ pfd1 = data1(:, 22);    pfd2 = data1(:, 23);    pfd3 = data1(:, 24);
 figure;
 plot(T, mfd1, 'r',T, mfd2, 'b',T, mfd3, 'm', 'LineWidth', 1.5);
 xlabel('t/s');
-ylabel('²âÁ¿¸ÉÈÅ');
+ylabel('æµ‹é‡å¹²æ‰°');
 ylim([-100,100]);
 legend('md1', 'md2', 'md3');
 
@@ -257,12 +257,12 @@ ylabel('$\hat{f_{d}}$', 'Interpreter','latex');
 ylim([-1,1]);
 legend('$\hat{f_{d1}}$', '$\hat{f_{d2}}$', '$\hat{f_{d3}}$', 'Interpreter','latex');
 set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter5\35kmÔ¤²â¸ÉÈÅÇúÏß');
+print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter5\35kmé¢„æµ‹å¹²æ‰°æ›²çº¿');
 
 figure;
 plot(T, pfd1-mfd1, 'r',T, pfd2-mfd2, 'b',T, pfd3-mfd3, 'm', 'LineWidth', 1.5);
 xlabel('t/s');
-ylabel('Ô¤²â-²âÁ¿¸ÉÈÅ');
+ylabel('é¢„æµ‹-æµ‹é‡å¹²æ‰°');
 ylim([-100,100]);
 legend('dd1', 'dd2', 'dd3');
 
@@ -275,16 +275,16 @@ legend('dd1', 'dd2', 'dd3');
 % % ylim([-100,100]);
 % legend('$\hat{\eta_1}$', '$\hat{\eta_2}$', '$\hat{\eta_3}$', 'Interpreter','latex');
 % set(gcf,'PaperUnits','centimeters','PaperPosition',[14 19 14 8.6],'PaperPositionMode', 'manual');
-% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\ÇĞ»»ÔöÒæ±ä»¯ÇúÏß');
+% print(gcf,'-dpng','-r300','F:\MasterEssay\essay\thesis\figures\chapter6\åˆ‡æ¢å¢ç›Šå˜åŒ–æ›²çº¿');
 
-% data3 = load('./data/useful/ÈıËÄÕÂ/pid+dann35_100_control.txt');
-% data4 = load('./data/useful/ÈıËÄÕÂ/pid+dann35_100_vehicle.txt'); 
+% data3 = load('./data/useful/ä¸‰å››ç« /pid+dann35_100_control.txt');
+% data4 = load('./data/useful/ä¸‰å››ç« /pid+dann35_100_vehicle.txt'); 
 % Alpha1 = data4(:,4);
 % Beta1 = data4(:,5);
 % Mu1 = data4(:,6);
 % 
-% data5 = load('./data/useful/ÈıËÄÕÂ/npid+dann35_100_control.txt');
-% data6 = load('./data/useful/ÈıËÄÕÂ/npid+dann35_100_vehicle.txt'); 
+% data5 = load('./data/useful/ä¸‰å››ç« /npid+dann35_100_control.txt');
+% data6 = load('./data/useful/ä¸‰å››ç« /npid+dann35_100_vehicle.txt'); 
 % Alpha2 = data6(:,4);
 % Beta2 = data6(:,5);
 % Mu2 = data6(:,6);
@@ -292,15 +292,15 @@ legend('dd1', 'dd2', 'dd3');
 % figure();
 % subplot(3, 1, 1);
 % plot(T, Alpha, 'r', T, Alpha1, 'b', T, Alpha2, 'm', T, Alpha_ref, 'k--',  'LineWidth', 1.5);
-% ylabel('¦Á(¡ã)');
-% pos = legend('»ùÓÚFPSOµÄACËã·¨²ÎÊıµ÷½Ú×ËÌ¬½Ç','²ÎÊı¹Ì¶¨×ËÌ¬½Ç','ACËã·¨²ÎÊıµ÷½Ú×ËÌ¬½Ç');
+% ylabel('Î±(Â°)');
+% pos = legend('åŸºäºFPSOçš„ACç®—æ³•å‚æ•°è°ƒèŠ‚å§¿æ€è§’','å‚æ•°å›ºå®šå§¿æ€è§’','ACç®—æ³•å‚æ•°è°ƒèŠ‚å§¿æ€è§’');
 % set(pos,'position',[0.55,0.73,0.3,0.1]);
 % subplot(3, 1, 2);
 % plot(T, Beta, 'r', T, Beta1, 'b', T, Beta2, 'm', T, Beta_ref, 'k--', 'LineWidth', 1.5);
-% ylabel('¦Â(¡ã)');
+% ylabel('Î²(Â°)');
 % subplot(3, 1, 3);
 % plot(T, Mu, 'r', T, Mu1, 'b',T, Mu2, 'm', T, Mu_ref, 'k--', 'LineWidth', 1.5);
-% ylabel('¦Ã_c(¡ã)');
+% ylabel('Î³_c(Â°)');
 % xlabel('t/s');
 % 
 % axes('position',[0.4 0.75 0.075 0.075]);

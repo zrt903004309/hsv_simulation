@@ -1402,6 +1402,4 @@ void loadAeroCoefficients(const double& Mach_step, const double& Alpha_step)
 		}
 		Ma += Mach_step;
 	}
-
-	
 }
