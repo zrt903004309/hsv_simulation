@@ -13,7 +13,7 @@ void getCoefficientsDerivative(
 	const double& p,
 	const double& q,
 	const double& r,
-	vector<vector<double>>& ans) {
+	std::vector<std::vector<double>>& ans) {
 
 	// 所有角度值是弧度制
 	double RE = Delta_a;		// Right Elevon 右襟翼
@@ -24,7 +24,7 @@ void getCoefficientsDerivative(
 	double Clbv, Cl_dRE, Cl_dLE, Cl_dRUD, Clr, Clp, Cl_state, Cnbv, Cn_dRE, Cn_dLE, Cn_dRUD, Cnp, Cnr, Cn_state, Cmbv, Cm_dRE, Cm_dLE, Cm_dRUD, Cm_q, Cm_state;
 
 	if (Mach < 0 || Mach > 30) {
-		std::cout << Delta_a << " " << Mach << "坠毁了" << endl;
+		std::cout << Delta_a << " " << Mach << "坠毁了" << std::endl;
 		exit(1);
 	}
 	else if (Mach <= 1.25) {
@@ -455,7 +455,7 @@ void getCoefficientsDerivative(
 			+ 3.60E-05 * pow(Alpha, 4) + 1.96E-06 * pow(Mach, 5) - 1.18E-06 * pow(Alpha, 5);
 
 		// 与舵角无关的气动力矩系数
-		Cn_state = Cnbv * Beta + Cnp * (p * B / 2 / V) + Cnr * (p * B / 2 / V);
+		Cn_state = Cnbv * Beta + Cnp * (p * B / 2 / V) + Cnr * (r * B / 2 / V);
 
 		// 6 pitching moment 俯仰力矩 绕y轴 改变俯仰角速度q
 		Cmbv = -2.192E-02 + 7.739E-03 * Mach - 2.260E-03 * Alpha + 1.808E-04 * (Alpha * Mach) - 8.849E-04 * pow(Mach, 2) + 2.616E-04 * pow(Alpha, 2)

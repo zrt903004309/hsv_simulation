@@ -14,16 +14,23 @@
 #include <Coefficients.h>
 #include <CoefficientsDerivative.h>
 
+#include<torch/torch.h>
+#include<torch/script.h>
+
+//#include<SerialPort.h>
+
 #define rad 57.2958
 #define PI	3.14159265
+
 #define controlMode "全局pid滑模"
+//#define controlMode "非线性全局pid滑模"
+//#define controlMode "非线性pid全局自适应滑模"
+//#define controlMode "非线性pid全局自适应滑模容错"
+//#define controlMode "基于DANN干扰观测器的全局pid滑模"
+//#define controlMode "基于DANN干扰观测器的非线性全局pid滑模"
+//#define controlMode "基于DANN干扰观测器的非线性pid全局自适应滑模"
+
 #define situation "舵面损伤"
-
-#define dsp_type float				// 针对dsp平台串口通讯需要使用float数据类型
-
-//enum class ControlMode : uint8_t {
-//
-//};
 
 struct ModelConfig
 {
@@ -32,31 +39,35 @@ struct ModelConfig
 	const unsigned int iters = (int)(T / step);					// 迭代次数
 	const int tctrl = 5;										// 控制器更新周期 * h
 
-	const double h = 33000.0;									// 高度 - 再入段一般在25km到31km
-	const double v = 4590.0;									// 速度
+	int disturb_flag = 1;										// 是否加入干扰
 
-	const double alpha = 0.0 / rad;								// 初始攻角
-	const double beta = 0.0 / rad;								// 初始侧滑角
-	const double mu = 0.0 / rad;								// 初始倾侧角
+	int hardware_en = 0;										// 是否加入硬件仿真
+	int network_en = 1;											// 是否加入神经网络
+
+	const double h = 35000.0;									// 高度 - 再入段一般在26km到40km
+	const double v = 3000.0;									// 速度
+
+	const double alpha = 2.0 / rad;								// 初始攻角
+	const double beta = 1.0 / rad;								// 初始侧滑角
+	const double mu = 2.0 / rad;								// 初始倾侧角
 
 
 	const double dd_alpha_ref = 0.0 / rad;						// 期望攻角角加速度
 	const double dd_beta_ref = 0.0 / rad;						// 期望侧滑角角加速度
 	const double dd_mu_ref = 0.0 / rad;							// 期望倾侧角角加速度
 
-	const double delta_limit = 20.0;							// 舵面角限幅,用deg
+	const double delta_limit = 30.0;							// 舵面角限幅,用deg
 
 	const double d_delta_limit = 200.0 * step * tctrl ;			// 舵面角角速度限幅 200deg/s
 
-	const double DecreaseFactor = 1;							// 效益损失系数
+	const double DecreaseFactor = 1.0;							// 效益损失系数
 	const double BiasFactor = 5;								// 舵面恒偏差值
 
 	// 跟踪的姿态角轨迹模式与赋值
-	int trajectoryMode = 0;										// 0:直接跟踪固定值 阶跃响应 1:跟踪斜坡信号
+	int trajectoryMode = 1;										// 0:直接跟踪固定值 阶跃响应 1:跟踪斜坡信号
 	const double alpha_ref = 5.0 / rad;							// 期望攻角
 	const double beta_ref = 0.0 / rad;							// 期望侧滑角
-	const double mu_ref = -2.0 / rad;							// 期望倾侧角
-
+	const double mu_ref = -1.0 / rad;							// 期望倾侧角
 
 	std::string vehicle_filename = "../data/" + std::to_string(int(h / 1000)) + "_" + std::to_string(int(DecreaseFactor * 100)) + "_vehicle.txt";
 	std::string control_filename = "../data/" + std::to_string(int(h / 1000)) + "_" + std::to_string(int(DecreaseFactor * 100)) + "_control.txt";

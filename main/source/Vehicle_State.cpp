@@ -1,11 +1,11 @@
 #include <Vehicle_State.h>
 
-void VehicleState::Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step)
+void VehicleState::Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step, ModelConfig& Model_Config)
 {
 	double F_D, F_Y, F_L;	// 阻力D，侧力Y，升力L
 	double M_X, M_Y, M_Z;
 	double d_X, d_Y, d_Z, d_V, d_Gamma, d_Chi, d_Alpha,d_Beta, d_Mu, d_p, d_q, d_r, d_Var_theta, d_Psi, d_Phi_b;
-	vector<double> Delta(3, 0.0), M_c(3, 0.0);
+	std::vector<double> Delta(3, 0.0), M_c(3, 0.0);
 	double Mass, Jx, Jy, Jz, C, B, S, Xcg;
 	
 	// 读飞行器参数
@@ -24,8 +24,8 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 	Delta[2] = Controller_State.Delta[2];
 
 	// 所有单位原始情况都是弧度制，公式中需要的是角度制
-	vector<double> C_FM(6);
-	getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM);
+	std::vector<double> C_FM(6);
+	getCoefficients(Ma, Alpha, Beta, Delta[0], Delta[1], Delta[2], C, B, V, p, q, r, C_FM, Model_Config.disturb_flag);
 	F_D = C_FM[0] * 0.5 * rho * V * V * S;
 	F_L = C_FM[1] * 0.5 * rho * V * V * S;
 	F_Y = C_FM[2] * 0.5 * rho * V * V * S;
@@ -36,6 +36,14 @@ void VehicleState::Vehicle_State_Update(ControllerState Controller_State, Vehicl
 
 	M_Y += Xcg * (F_D * sin(Alpha) + F_L * cos(Alpha));
 	M_Z -= Xcg * F_Y;
+
+	if (Model_Config.disturb_flag == 1) {
+		double deltaM = 15000 * (1 + sin(PI / 2 * Time));
+		//double deltaM = 6000 * (1 + sin(PI/2 * Time));
+		M_X += deltaM;
+		M_Y += deltaM;
+		M_Z += deltaM;
+	}
 
 	printf("马赫:%f 攻角:%f 侧滑角:%f 倾侧角:%f\n", Ma, Alpha*rad, Beta*rad, Mu*rad);
 	//printf("X:%f Y:%f H:%f\n",X, Y, -Z);

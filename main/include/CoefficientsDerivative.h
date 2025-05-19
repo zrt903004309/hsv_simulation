@@ -3,7 +3,6 @@
 
 #include <Global.h>
 #include <vector>
-using namespace std;
 
 // 输入变量
 // Mach : 马赫
@@ -35,6 +34,6 @@ void getCoefficientsDerivative(const double& Mach,
 							   const double& p, 
 							   const double& q, 
 							   const double& r, 
-							   vector<vector<double>>& y);
+							   std::vector<std::vector<double>>& y);
 
 #endif

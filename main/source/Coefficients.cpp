@@ -13,7 +13,8 @@ void getCoefficients(
 	const double& omega_x, 
 	const double& omega_y, 
 	const double& omega_z, 
-	vector<double>& ans) {
+	std::vector<double>& ans,
+	int& flag) {
 
 	// 和《Six DoF Nonlinear Equations of Motion for a Generic Hypersonic Vehicle》中的左右襟翼相反
 	// delta_a对应 右升降副翼 delta_e对应 左升降副翼 delta_r 对应 方向舵
@@ -35,7 +36,7 @@ void getCoefficients(
 	double CLbv, CL_RE, CL_LE, CDbv, CD_RE, CD_LE, CD_RUD, CYB, CY_RE, CY_LE, CY_RUD;
 	double Cllbv, Cll_RE, Cll_LE, Cll_RUD, Cllr, Cllp, Cnbv, Cn_RE, Cn_LE, Cn_RUD, Cnp, Cnr, Cmbv, Cm_RE, Cm_LE, Cm_RUD, Cm_q;
 	if (Mach < 0 || Mach > 30) {
-		std::cout << Delta_e << " " << Mach << "坠毁了" << endl;
+		std::cout << Delta_e << " " << Mach << "坠毁了" << std::endl;
 		exit(1);
 	}
 	else if (Mach <= 1.25) {
@@ -682,17 +683,32 @@ void getCoefficients(
 	// yawing moment 偏航力矩 绕z轴 改变偏航加速度r
 	double mz = Cnbv * Beta + Cn_RE + Cn_LE + Cn_RUD + (Cnp * omega_x + Cnr * omega_z) * B / (2 * Vel);
 
-	ans[0] = CD;
-	ans[1] = CL;
-	ans[2] = CN;
-	ans[3] = mx;	// 引起相对于机体坐标系x轴的转动，产生滚转角速度p
-	ans[4] = my;	// 引起相对于机体坐标系y轴的转动，产生俯仰角速度q
-	ans[5] = mz;	// 引起相对于机体坐标系z轴的转动，产生偏航角速度r
+	if (flag == 1) {
+		srand((unsigned int)time(NULL));
+		/*double D = (double)(rand() % 21 - 10) / 100, L = (double)(rand() % 21 - 10) / 100, N = (double)(rand() % 21 - 10) / 100;
+		double l = (double)(rand() % 21 - 10) / 100, m = (double)(rand() % 21 - 10) / 100, n = (double)(rand() % 21 - 10) / 100;*/
+		double D = (double)(rand() % 41 - 20) / 100, L = (double)(rand() % 41 - 20) / 100, N = (double)(rand() % 41 - 20) / 100;
+		double l = (double)(rand() % 41 - 20) / 100, m = (double)(rand() % 41 - 20) / 100, n = (double)(rand() % 41 - 20) / 100;
+		ans[0] = CD * (1 + D);
+		ans[1] = CL * (1 + L);
+		ans[2] = CN * (1 + N);
+		ans[3] = mx * (1 + l);
+		ans[4] = my * (1 + m);
+		ans[5] = mz * (1 + n);
+	}
+	else {
+		ans[0] = CD;
+		ans[1] = CL;
+		ans[2] = CN;
+		ans[3] = mx;	// 引起相对于机体坐标系x轴的转动，产生滚转角速度p
+		ans[4] = my;	// 引起相对于机体坐标系y轴的转动，产生俯仰角速度q
+		ans[5] = mz;	// 引起相对于机体坐标系z轴的转动，产生偏航角速度r
+	}
 
 	return;
 }
 
-void getCoefficientsDetails(const double& Mach, const double& Alpha, const double& Beta, const double& Delta_e, const double& Delta_a, const double& Delta_r, const double& C, const double& B, const double& Vel, const double& omega_x, const double& omega_y, const double& omega_z, vector<vector<double>>& ans)
+void getCoefficientsDetails(const double& Mach, const double& Alpha, const double& Beta, const double& Delta_e, const double& Delta_a, const double& Delta_r, const double& C, const double& B, const double& Vel, const double& omega_x, const double& omega_y, const double& omega_z, std::vector<std::vector<double>>& ans)
 {
 	double LE = Delta_e;		// Left Elevon 左襟翼
 	double RE = Delta_a;		// Right Elevon 右襟翼
@@ -701,7 +717,7 @@ void getCoefficientsDetails(const double& Mach, const double& Alpha, const doubl
 	double CLbv, CL_RE, CL_LE, CDbv, CD_RE, CD_LE, CD_RUD, CYB, CY_RE, CY_LE, CY_RUD;
 	double Cllbv, Cll_RE, Cll_LE, Cll_RUD, Cllr, Cllp, Cnbv, Cn_RE, Cn_LE, Cn_RUD, Cnp, Cnr, Cmbv, Cm_RE, Cm_LE, Cm_RUD, Cm_q;
 	if (Mach < 0 || Mach > 30) {
-		std::cout << Delta_e << " " << Mach << "坠毁了" << endl;
+		std::cout << Delta_e << " " << Mach << "坠毁了" << std::endl;
 		exit(1);
 	}
 	else if (Mach <= 1.25) {
@@ -1348,9 +1364,9 @@ void getCoefficientsDetails(const double& Mach, const double& Alpha, const doubl
 	// yawing moment 偏航力矩 绕z轴 改变偏航加速度r
 	double mz = Cnbv * Beta + Cn_RE + Cn_LE + Cn_RUD + (Cnp * omega_x + Cnr * omega_z) * B / (2 * Vel);
 
-	ans[0][0] = CDbv;		ans[0][1] = CD_LE;		ans[0][2] = CD_RE;		ans[0][3] = CD_RUD;
-	ans[1][0] = CLbv;		ans[1][1] = CL_LE;		ans[1][0] = CL_RE;
-	ans[2][0] = CYB;		ans[2][1] = CY_LE;		ans[2][2] = CY_RE;		ans[2][2] = CY_RUD;
+	ans[0][0] = CDbv;		ans[0][1] = CD_LE;		ans[0][2] = CD_RE;		ans[0][3] = CD_RUD;		ans[0][4] = CD;
+	ans[1][0] = CLbv;		ans[1][1] = CL_LE;		ans[1][2] = CL_RE;		ans[1][3] = CL;
+	ans[2][0] = CYB;		ans[2][1] = CY_LE;		ans[2][2] = CY_RE;		ans[2][3] = CY_RUD;
 	ans[3][0] = Cllbv;		ans[3][1] = Cll_LE;		ans[3][2] = Cll_RE;		ans[3][3] = Cll_RUD;	// 引起相对于机体坐标系x轴的转动，产生滚转角速度p
 	ans[4][0] = Cmbv;		ans[4][1] = Cm_LE;		ans[4][2] = Cm_RE;		ans[4][3] = Cm_RUD;	// 引起相对于机体坐标系y轴的转动，产生俯仰角速度q
 	ans[5][0] = Cnbv;		ans[5][1] = Cn_LE;		ans[5][2] = Cn_RE;		ans[5][3] = Cn_RUD;	// 引起相对于机体坐标系z轴的转动，产生偏航角速度r
@@ -1367,7 +1383,7 @@ void loadAeroCoefficients(const double& Mach_step, const double& Alpha_step)
 	File = fopen("../data/aero_coefficients.txt", "w");
 
 	double Ma = 5, Alpha = -5;
-	vector<vector<double>> aero(6, vector<double>(4, 0));
+	std::vector<std::vector<double>> aero(6, std::vector<double>(5, 0));
 
 	// 打1500个点
 	for (int i = 0; i < 301; i++) {

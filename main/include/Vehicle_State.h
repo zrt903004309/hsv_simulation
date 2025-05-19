@@ -7,13 +7,14 @@
 
 class ControllerState;
 struct VehiclePara;
+struct ModelConfig;
 
 class VehicleState {
 public:
 
 	VehicleState(double H = 30000.0, double v = 3000.0, double alpha = 2.0 / rad, double beta = 1.0 / rad, double mu = 1.0 / rad);
 
-	void Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step);
+	void Vehicle_State_Update(ControllerState Controller_State, VehiclePara Vehicle_Para, const double& step, ModelConfig& Model_Config);
 
 	//void Initial_Vehicle_State();
 

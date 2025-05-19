@@ -22,7 +22,7 @@ cl_rud = nan(size(ma));cm_rud = nan(size(ma));cn_rud = nan(size(ma));
 % 填充Z矩阵
 for i = 1:length(unique_Ma)
     for j = 1:length(unique_Alpha)
-        index = (i-1)*length(unique_Ma) + j;
+        index = (i-1)*length(unique_Alpha) + j;
         cd(j, i) = CD(index);   cl(j, i) = CL(index);   cm_a(j, i) = Cm_alpha(index);   ld_ratio(j, i) = LD_ratio(index);
         cl_le(j, i) = Cl_LE(index); cm_le(j, i) = Cm_LE(index); cn_le(j, i) = Cn_LE(index);
         cl_rud(j, i) = Cl_RUD(index);   cm_rud(j, i) = Cm_RUD(index);   cn_rud(j, i) = Cn_RUD(index);
@@ -127,3 +127,14 @@ set(gca, 'FontSize', 14);
 view(-40, 10);
 
 saveas(Fig9,'./fig/chapter2/Cn_deltar.png');
+
+Fig10 = mesh(alpha, ma, ld_ratio);
+xlabel('\alpha(deg)', 'FontSize',18);
+ylabel('Ma', 'FontSize',18);
+zlabel('L-D ratio', 'FontSize',18);
+
+set(gca, 'FontSize', 14);
+% set(gca, 'LineWidth', 0.8); % 设置刻度线长度
+view(-40, 10);
+
+saveas(Fig10,'./fig/chapter2/LD_ratio.png');

@@ -27,6 +27,14 @@ public:
 	double cur_beta_ref;		// 上一时刻的期望侧滑角
 	double cur_mu_ref;			// 上一时刻的期望倾侧角
 
+	double d_alpha_ref;			// 期望攻角角加速度
+	double d_beta_ref;			// 期望侧滑角角加速度
+	double d_mu_ref;			// 期望倾侧角角加速度
+
+	double pre_d_alpha_ref;		// 期望攻角角加速度
+	double pre_d_beta_ref;		// 期望侧滑角角加速度
+	double pre_d_mu_ref;		// 期望倾侧角角加速度
+
 	double dd_alpha_ref;		// 期望攻角角加速度
 	double dd_beta_ref;			// 期望侧滑角角加速度
 	double dd_mu_ref;			// 期望倾侧角角加速度
